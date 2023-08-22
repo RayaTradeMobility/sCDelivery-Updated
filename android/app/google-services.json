@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "542119830375",
+    "project_id": "scdelivery-5306c",
+    "storage_bucket": "scdelivery-5306c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:542119830375:android:8d71ddab28e67cec7745c2",
+        "android_client_info": {
+          "package_name": "com.raya.scdelivery"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "542119830375-8febvq0884vscpj4v8ken1ldruh14htb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGA1_bJNosygDe33LOBi9UbEDjwU1b35A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "542119830375-8febvq0884vscpj4v8ken1ldruh14htb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
