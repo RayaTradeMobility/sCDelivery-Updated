@@ -9,48 +9,42 @@ import '../Screens/LoginScreen.dart';
 
 class LocalNotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   static void initialize(BuildContext context) {
     const InitializationSettings initializationSettings =
-    InitializationSettings(
-        android: AndroidInitializationSettings("@mipmap/ic_launcher"),
-        iOS: IOSInitializationSettings(requestAlertPermission:true,requestBadgePermission: true,requestSoundPermission: true,defaultPresentAlert: true,defaultPresentBadge: true,defaultPresentSound: true,)
-
-    );
-    _notificationsPlugin.initialize(initializationSettings,onSelectNotification: (String? route) async{
-      if(route != null){
-        Navigator.push(context, MaterialPageRoute(builder: (context){
+        InitializationSettings(
+            android: AndroidInitializationSettings("@mipmap/ic_launcher"),
+            iOS: IOSInitializationSettings(
+              requestAlertPermission: true,
+              requestBadgePermission: true,
+              requestSoundPermission: true,
+              defaultPresentAlert: true,
+              defaultPresentBadge: true,
+              defaultPresentSound: true,
+            ));
+    _notificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: (String? route) async {
+      if (route != null) {
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
           return const LoginScreen();
         }));
       }
-
     });
-
   }
 
   static void display(RemoteMessage message) async {
-
     try {
-      final id = DateTime.now().millisecondsSinceEpoch ~/1000;
+      final id = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
       const NotificationDetails notificationDetails = NotificationDetails(
           android: AndroidNotificationDetails(
-              "easyapproach",
-              "easyapproach channel",
-              "this is our channel",
+              "easyapproach", "easyapproach channel", "this is our channel",
               importance: Importance.max,
               priority: Priority.high,
-              playSound: true
-          ),
+              playSound: true),
           iOS: IOSNotificationDetails(
-              presentBadge: true,
-              presentAlert: true,
-              presentSound: true
-
-          )
-      );
-
+              presentBadge: true, presentAlert: true, presentSound: true));
 
       await _notificationsPlugin.show(
         id,

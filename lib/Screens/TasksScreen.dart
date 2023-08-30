@@ -98,12 +98,10 @@ class _TasksScreenState extends State<TasksScreen> {
                       ],
                     );
                   }
-                }
-                else if (snapshot.hasData && snapshot.data!.tasksDriverVMs == null) {
-
+                } else if (snapshot.hasData &&
+                    snapshot.data!.tasksDriverVMs == null) {
                   return const Center(child: Text("No Data to show"));
-                }
-                else if (snapshot.hasError) {
+                } else if (snapshot.hasError) {
                   return Text(
                       '${snapshot.error}' "You don't have data in this time");
                 }

@@ -8,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:RayaExpressDriver/API/API.dart';
 import 'package:RayaExpressDriver/Models/UserModel.dart';
 import 'package:RayaExpressDriver/Screens/MenuScreen.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:RayaExpressDriver/Services/ServicesUtililty.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -203,57 +204,68 @@ class _LoginScreenState extends State<LoginScreen> {
                   setState(() {
                     _isloading = true;
                   });
-                  if (_formKey.currentState!.validate()) {
-                    try {
-                      final tokenFcm =
-                          await FirebaseMessaging.instance.getToken();
-                      String deviceid = await deviceID.getId();
-                      UserModel user = await api.login(
+
+                  final permissionStatus = await Permission.phone.request();
+
+                  if (permissionStatus.isGranted) {
+                    if (_formKey.currentState!.validate()) {
+                      try {
+                        final tokenFcm =
+                            await FirebaseMessaging.instance.getToken();
+                        String deviceid = await deviceID.getId();
+                        UserModel user = await api.login(
                           username.text,
                           password.text,
                           tokenFcm,
                           deviceid,
-                          await ServicesUtility().getPackageInfo());
-                      if (user.headerInfo!.code == "00") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) {
-                            return MenuScreen(
+                          await ServicesUtility().getPackageInfo(),
+                        );
+
+                        if (user.headerInfo!.code == "00") {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) {
+                              return MenuScreen(
                                 driverUsername: user.name!,
                                 dUserID: user.dUserID!,
-                                driverID: user.driverID!);
-                          }),
-                        );
-                      } else {
+                                driverID: user.driverID!,
+                              );
+                            }),
+                          );
+                        } else {
+                          setState(() {
+                            _isloading = false;
+                          });
+                          Fluttertoast.showToast(
+                            msg: user.headerInfo!.message ?? 'Error Connection',
+                            // Toast properties
+                            // ...
+                          );
+                        }
+                      } on Exception {
                         setState(() {
                           _isloading = false;
                         });
                         Fluttertoast.showToast(
-                            msg: user.headerInfo!.message ?? 'Error Connection',
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.CENTER,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.red,
-                            textColor: Colors.white,
-                            fontSize: 16.0);
+                          msg: 'Error Connection',
+                          // Toast properties
+                          // ...
+                        );
                       }
-                    } on Exception {
+                    } else {
                       setState(() {
                         _isloading = false;
                       });
-                      Fluttertoast.showToast(
-                          msg: 'Error Connection',
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.CENTER,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: Colors.red,
-                          textColor: Colors.white,
-                          fontSize: 16.0);
                     }
                   } else {
                     setState(() {
                       _isloading = false;
                     });
+                    Fluttertoast.showToast(
+                      msg: 'Permission not granted',
+                      // Toast properties
+                      // ...
+                    );
                   }
                 },
                 child: Row(

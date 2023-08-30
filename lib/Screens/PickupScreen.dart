@@ -77,7 +77,6 @@ class _PickupScreenState extends State<PickupScreen>
                     child: FutureBuilder<PickupModel>(
                       future: pickups,
                       builder: (context, snapshot) {
-
                         if (snapshot.hasData) {
                           if (snapshot.data!.pickupVMs != null) {
                             return Column(
@@ -97,7 +96,8 @@ class _PickupScreenState extends State<PickupScreen>
                                   )
                               ],
                             );
-                          } else {
+                          } else if(snapshot.data!.pickupVMs!.isEmpty) {
+
                             return const Text('لا يوجد تحميلات حتي الان');
                           }
                         } else if (snapshot.hasError) {

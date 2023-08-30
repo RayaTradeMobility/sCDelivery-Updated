@@ -82,7 +82,7 @@ class _ReleasesCardState extends State<ReleasesCard> {
                     driverID: widget.driverID,
                     releaseID: widget.releaseID,
                     dUserID: widget.dUserID,
-                    paymentStatus: widget.paymentstatus!,
+                    paymentStatus: widget.paymentstatus ?? 0,
                   );
                 }),
               );
@@ -295,7 +295,6 @@ class _PickupCardState extends State<PickupCard> {
   API api = API();
   ServicesUtility servicesUtility = ServicesUtility();
 
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -342,7 +341,7 @@ class _PickupCardState extends State<PickupCard> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                       const Text(
+                      const Text(
                         'رقم الاوردر: ',
                         style: TextStyle(
                             color: Colors.grey, fontWeight: FontWeight.bold),

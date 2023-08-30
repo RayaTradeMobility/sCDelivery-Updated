@@ -3,7 +3,6 @@
 import 'dart:io';
 import 'package:collapsible/collapsible.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -40,7 +39,6 @@ class ReleaseDetails extends StatefulWidget {
 class _ReleaseDetailsState extends State<ReleaseDetails> {
   late Future<ReleaseDetailsModel> releaseDetails;
   PhoneState status = PhoneState.nothing();
-  bool granted = false;
   Duration callDuration = Duration.zero;
   DateTime? callStartTime;
   API api = API();
@@ -77,10 +75,10 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
     });
   }
 
-  void makePhoneCall(String phoneNumber) async {
-    final url = 'tel:$phoneNumber';
-    if (await canLaunchUrl(url as Uri)) {
-      await launchUrl(url as Uri);
+  void makePhoneCall(var phoneNumber) async {
+    final url = Uri.parse('tel:$phoneNumber');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
     } else {
       // ignore: use_build_context_synchronously
       showDialog(
@@ -239,8 +237,8 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                         width: 5.0,
                                       ),
                                       Text(
-                                        snapshot.data!.releaseRequests!.cName!
-                                            .toString(),
+                                        snapshot.data!.releaseRequests!.cName ??
+                                            ''.toString(),
                                         style: const TextStyle(
                                             color: Colors.black,
                                             fontWeight: FontWeight.bold),
@@ -265,42 +263,79 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                       const SizedBox(
                                         width: 5.0,
                                       ),
+                                      Text(
+                                        snapshot.data!.releaseRequests!
+                                            .cMobileNumber1!,
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(
+                                        width: 5.0,
+                                      ),
                                       ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          foregroundColor: Colors.white,
+                                          backgroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(32.0),
+                                          ),
+                                        ),
                                         onPressed: () async {
-                                          if (kDebugMode) {
-                                            print(callDuration.inSeconds);
-                                          }
-                                          final call = Uri.parse(snapshot
-                                              .data!
-                                              .releaseRequests!
-                                              .cMobileNumber1!);
+                                          final call = Uri.parse("tel:" +
+                                              snapshot.data!.releaseRequests!
+                                                  .cMobileNumber1!);
+
                                           if (await canLaunchUrl(call)) {
                                             launchUrl(call);
                                           } else {
                                             throw 'Could not launch $call';
                                           }
-                                          makePhoneCall(status.number!);
-                                          setState(() {
-                                            setStream();
-                                            // api.callTrack(
-                                            //     widget.dUserID,
-                                            //     snapshot.data!.releaseRequests!
-                                            //         .orderId!,
-                                            //     DateTime.now(),
-                                            //     DateTime.now().difference(
-                                            //             callDuration
-                                            //                 as DateTime)
-                                            //         as DateTime,
-                                            //     snapshot.data!.releaseRequests!
-                                            //         .cMobileNumber1!);
-                                          });
+                                          // setState(()  {
+                                          //   // api.callTrack(
+                                          //   //     widget.dUserID,
+                                          //   //     snapshot.data!.releaseRequests!
+                                          //   //         .orderId!,
+                                          //   //     DateTime.now(),
+                                          //   //     DateTime.now().difference(
+                                          //   //             callDuration
+                                          //   //                 as DateTime)
+                                          //   //         as DateTime,
+                                          //   //     snapshot.data!.releaseRequests!
+                                          //   //         .cMobileNumber1!);
+                                          // });
                                         },
-                                        child: Text(snapshot.data!
-                                            .releaseRequests!.cMobileNumber1!
-                                            .toString()),
+                                        child: const Icon(
+                                          Icons.call,
+                                          size: 12,
+                                          color: Colors.black,
+                                        ),
                                       ),
+                                      if (status.status ==
+                                              PhoneStateStatus.CALL_INCOMING ||
+                                          status.status ==
+                                              PhoneStateStatus.CALL_STARTED)
+                                        GestureDetector(
+                                          onTap: () {
+                                            if (status.number != null) {
+                                              makePhoneCall(status.number!);
+                                            }
+                                          },
+                                          child: Text(
+                                            "Number: ${status.number}",
+                                            style: const TextStyle(
+                                                fontSize: 24,
+                                                decoration:
+                                                    TextDecoration.underline),
+                                          ),
+                                        ),
                                     ],
                                   ),
+                                  Row(children: [
+                                    const Text("توقيت المكالمه: "),
+                                    Text('${callDuration.inSeconds}')
+                                  ]),
                                   if (snapshot.data!.releaseRequests!
                                           .cMobileNumber2 !=
                                       null)
@@ -322,27 +357,74 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                         const SizedBox(
                                           width: 5.0,
                                         ),
+                                        Text(
+                                          snapshot.data!.releaseRequests!
+                                              .cMobileNumber2!,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const SizedBox(
+                                          width: 5.0,
+                                        ),
                                         ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.white,
+                                            backgroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(32.0),
+                                            ),
+                                          ),
                                           onPressed: () async {
-                                            makePhoneCall(status.number!);
+                                            final call = Uri.parse("tel:" +
+                                                snapshot.data!.releaseRequests!
+                                                    .cMobileNumber2!);
 
-                                            if (kDebugMode) {
-                                              print(callDuration.inSeconds);
-                                            }
-                                            final call = Uri.parse(snapshot
-                                                .data!
-                                                .releaseRequests!
-                                                .cMobileNumber2!);
                                             if (await canLaunchUrl(call)) {
                                               launchUrl(call);
                                             } else {
                                               throw 'Could not launch $call';
                                             }
+                                            // setState(()  {
+                                            //   // api.callTrack(
+                                            //   //     widget.dUserID,
+                                            //   //     snapshot.data!.releaseRequests!
+                                            //   //         .orderId!,
+                                            //   //     DateTime.now(),
+                                            //   //     DateTime.now().difference(
+                                            //   //             callDuration
+                                            //   //                 as DateTime)
+                                            //   //         as DateTime,
+                                            //   //     snapshot.data!.releaseRequests!
+                                            //   //         .cMobileNumber1!);
+                                            // });
                                           },
-                                          child: Text(snapshot.data!
-                                              .releaseRequests!.cMobileNumber2!
-                                              .toString()),
+                                          child: const Icon(
+                                            Icons.call,
+                                            size: 12,
+                                            color: Colors.black,
+                                          ),
                                         ),
+                                        if (status.status ==
+                                                PhoneStateStatus
+                                                    .CALL_INCOMING ||
+                                            status.status ==
+                                                PhoneStateStatus.CALL_STARTED)
+                                          GestureDetector(
+                                            onTap: () {
+                                              if (status.number != null) {
+                                                makePhoneCall(status.number!);
+                                              }
+                                            },
+                                            child: Text(
+                                              "Number: ${status.number}",
+                                              style: const TextStyle(
+                                                  fontSize: 24,
+                                                  decoration:
+                                                      TextDecoration.underline),
+                                            ),
+                                          ),
                                       ],
                                     ),
                                   Row(

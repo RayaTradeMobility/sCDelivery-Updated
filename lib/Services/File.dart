@@ -3,14 +3,18 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+
 class FileList extends StatefulWidget {
   final List<PlatformFile> files;
   final ValueChanged<PlatformFile> onOpenedFile;
+
   const FileList({Key? key, required this.files, required this.onOpenedFile})
       : super(key: key);
+
   @override
   _FileListState createState() => _FileListState();
 }
+
 class _FileListState extends State<FileList> {
   @override
   Widget build(BuildContext context) {
@@ -27,6 +31,7 @@ class _FileListState extends State<FileList> {
           }),
     );
   }
+
   Widget buildFile(PlatformFile file) {
     final kb = file.size / 1024;
     final mb = kb / 1024;
@@ -38,14 +43,14 @@ class _FileListState extends State<FileList> {
       child: ListTile(
         leading: (file.extension == 'jpg' || file.extension == 'png')
             ? Image.file(
-          File(file.path.toString()),
-          width: 80,
-          height: 80,
-        )
+                File(file.path.toString()),
+                width: 80,
+                height: 80,
+              )
             : const SizedBox(
-          width: 80,
-          height: 80,
-        ),
+                width: 80,
+                height: 80,
+              ),
         title: Text(file.name),
         subtitle: Text('${file.extension}'),
         trailing: Text(

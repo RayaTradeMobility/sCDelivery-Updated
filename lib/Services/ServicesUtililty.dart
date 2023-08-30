@@ -10,7 +10,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 class ServicesUtility {
   getId() async {
     var deviceInfo = DeviceInfoPlugin();
-    if (Platform.isIOS) { // import 'dart:io'
+    if (Platform.isIOS) {
+      // import 'dart:io'
       var iosDeviceInfo = await deviceInfo.iosInfo;
       return iosDeviceInfo.identifierForVendor; // unique ID on iOS
     } else {
@@ -28,15 +29,16 @@ class ServicesUtility {
 
   getLocation() async {
     bool servicestatus = await Geolocator.isLocationServiceEnabled();
-    if(servicestatus){
+    if (servicestatus) {
       if (kDebugMode) {
         print("GPS service is enabled");
       }
-    }else{
+    } else {
       if (kDebugMode) {
         print("GPS service is disabled.");
       }
-    }LocationPermission permission = await Geolocator.checkPermission();
+    }
+    LocationPermission permission = await Geolocator.checkPermission();
 
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -44,24 +46,22 @@ class ServicesUtility {
         if (kDebugMode) {
           print('Location permissions are denied');
         }
-      }else if(permission == LocationPermission.deniedForever){
+      } else if (permission == LocationPermission.deniedForever) {
         if (kDebugMode) {
           print("'Location permissions are permanently denied");
         }
-      }else{
+      } else {
         if (kDebugMode) {
           print("GPS Location service is granted");
         }
       }
-    }else{
+    } else {
       if (kDebugMode) {
         print("GPS Location permission granted.");
       }
     }
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-   return position; //Output: 29.6593457
-
-
-
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    return position; //Output: 29.6593457
   }
 }

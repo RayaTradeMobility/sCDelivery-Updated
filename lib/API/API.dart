@@ -100,8 +100,13 @@ class API {
     var streamedResponse = await request.send();
     var response = await http.Response.fromStream(streamedResponse);
     if (response.statusCode == 200) {
+      print(response.body);
+      print('True');
       return ReleasesModel.fromJson(jsonDecode(response.body));
     } else {
+      print(response.body);
+
+      print("false");
       throw Exception("Failed to load Data");
     }
   }
@@ -331,10 +336,7 @@ class API {
       'Password': 'H51Qob<zRRQ/f@%^',
       'Content-Type': 'application/json'
     };
-    var request = http.Request(
-        'POST',
-        Uri.parse(
-            '$url/SearchPickupsByAWB'));
+    var request = http.Request('POST', Uri.parse('$url/SearchPickupsByAWB'));
     request.body = json.encode({"awb": aWB, "driverID": driverID});
     request.headers.addAll(headers);
     var streamedResponse = await request.send();
@@ -356,18 +358,13 @@ class API {
       'Username': 'Logistics',
       'Password': 'H51Qob<zRRQ/f@%^',
     };
-    var request = http.Request(
-        'GET',
-        Uri.parse(
-            '$url/GetListOfPicks?DriverID=' +
-                driverID.toString() +
-                ''));
+    var request = http.Request('GET',
+        Uri.parse('$url/GetListOfPicks?DriverID=' + driverID.toString() + ''));
 
     request.headers.addAll(headers);
     var streamedResponse = await request.send();
     var response = await http.Response.fromStream(streamedResponse);
     if (response.statusCode == 200) {
-
       return PickupModel.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to load Data");
@@ -381,10 +378,7 @@ class API {
       'Password': 'H51Qob<zRRQ/f@%^',
       'Content-Type': 'application/json'
     };
-    var request = http.Request(
-        'POST',
-        Uri.parse(
-            '$url/PickAction'));
+    var request = http.Request('POST', Uri.parse('$url/PickAction'));
     request.body = json.encode({
       "reason": reason,
       "scheduleID": scheduleID,
@@ -411,11 +405,8 @@ class API {
 
   Future<TasksModel> getTasksList(int driverID) async {
     var headers = {'Username': 'Logistics', 'Password': 'H51Qob<zRRQ/f@%^'};
-    var request = http.Request(
-        'GET',
-        Uri.parse(
-            '$url/GetListOfTasks?DriverID=' +
-                driverID.toString()));
+    var request = http.Request('GET',
+        Uri.parse('$url/GetListOfTasks?DriverID=' + driverID.toString()));
 
     request.headers.addAll(headers);
     var streamedResponse = await request.send();
