@@ -1146,7 +1146,6 @@ class _DeliveredAlertDialogState extends State<DeliveredAlertDialog> {
           name: pickedFile.path.split('/').last,
           size: 0,
           path: pickedFile.path,
-
         );
       });
     }
