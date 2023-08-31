@@ -100,13 +100,8 @@ class API {
     var streamedResponse = await request.send();
     var response = await http.Response.fromStream(streamedResponse);
     if (response.statusCode == 200) {
-      print(response.body);
-      print('True');
       return ReleasesModel.fromJson(jsonDecode(response.body));
     } else {
-      print(response.body);
-
-      print("false");
       throw Exception("Failed to load Data");
     }
   }
@@ -398,7 +393,6 @@ class API {
       }
       return PickupModel.fromJson(jsonDecode(response.body));
     } else {
-      print("no");
       throw Exception("Failed to load Data");
     }
   }

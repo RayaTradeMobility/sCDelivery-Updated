@@ -1139,7 +1139,7 @@ class _DeliveredAlertDialogState extends State<DeliveredAlertDialog> {
   final picker = ImagePicker();
 
   Future<void> pickImage(ImageSource source) async {
-    final pickedFile = await picker.pickImage(source: source);
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       setState(() {
         file = PlatformFile(
