@@ -1135,14 +1135,19 @@ class _DeliveredAlertDialogState extends State<DeliveredAlertDialog> {
   PlatformFile file = PlatformFile(name: 'name', size: 0);
   late FilePickerResult result;
   ServicesUtility servicesUtility = ServicesUtility();
-  final bool isLoading = false;
+  bool isLoading = false;
   final picker = ImagePicker();
 
   Future<void> pickImage(ImageSource source) async {
     final pickedFile = await picker.pickImage(source: source);
     if (pickedFile != null) {
       setState(() {
-        file = File(pickedFile.path) as PlatformFile;
+        file = PlatformFile(
+          name: pickedFile.path.split('/').last,
+          size: 0,
+          path: pickedFile.path,
+
+        );
       });
     }
   }

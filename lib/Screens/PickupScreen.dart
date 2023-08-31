@@ -96,8 +96,7 @@ class _PickupScreenState extends State<PickupScreen>
                                   )
                               ],
                             );
-                          } else if(snapshot.data!.pickupVMs!.isEmpty) {
-
+                          } else if (snapshot.data!.pickupVMs!.isEmpty) {
                             return const Text('لا يوجد تحميلات حتي الان');
                           }
                         } else if (snapshot.hasError) {
