@@ -241,7 +241,7 @@ class API {
     }
   }
 
-  callTrack(String submitter, int releaseId, DateTime startAt, DateTime endAt,
+  callTrack(String submitter, int releaseId, String startAt, String endAt,
       String mobileNumber) async {
     var headers = {
       'Username': 'Logistics',
@@ -253,13 +253,16 @@ class API {
         Uri.parse(
             'http://www.rayatrade.com/RayaLogisticsAPI/api/CallTracking/CreateShipment'));
     request.body = json.encode({
-      "submitter": submitter,
-      "releaseId": releaseId,
-      "classificationId": 1,
-      "startAt": startAt,
-      "endAt": endAt,
-      "comment": mobileNumber,
-      "recordPath": ""
+      {
+        "submitter": submitter,
+        "releaseId": releaseId,
+        "classificationId": 1,
+        "startAt": startAt,
+        "endAt": endAt,
+        "comment": "",
+        "recordPath": "",
+        "mobileNumber": mobileNumber
+      }
     });
     request.headers.addAll(headers);
 

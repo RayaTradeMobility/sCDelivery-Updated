@@ -78,8 +78,8 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
         } else if (event.status == PhoneStateStatus.CALL_ENDED) {
           if (callStartTime != null) {
             callDuration = DateTime.now().difference(callStartTime!);
-            api.callTrack(widget.dUserID, widget.releaseID, callStartTime!,
-                callStartTime!.add(callDuration), status.number!);
+            api.callTrack(widget.dUserID, widget.releaseID, callStartTime!.toString(),
+                callStartTime!.add(callDuration).toString(), status.number!);
             if (kDebugMode) {
               print('userId: ${widget.dUserID}');
             }
