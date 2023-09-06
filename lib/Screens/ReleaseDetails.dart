@@ -26,16 +26,15 @@ class ReleaseDetails extends StatefulWidget {
   final bool releaseNew;
   final int paymentStatus;
 
-
-  const ReleaseDetails(
-      {Key? key,
-      required this.releaseID,
-      required this.dUserID,
-      required this.driverID,
-      required this.driverUsername,
-      required this.releaseNew,
-      required this.paymentStatus,})
-      : super(key: key);
+  const ReleaseDetails({
+    Key? key,
+    required this.releaseID,
+    required this.dUserID,
+    required this.driverID,
+    required this.driverUsername,
+    required this.releaseNew,
+    required this.paymentStatus,
+  }) : super(key: key);
 
   @override
   State<ReleaseDetails> createState() => _ReleaseDetailsState();
@@ -57,32 +56,30 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
   DateTime? callStartTime;
   DateTime? callEndTime;
   bool granted = false;
-  bool isCallEnded =false;
+  bool isCallEnded = false;
 
   @override
   void initState() {
     super.initState();
     releaseDetails = api.getReleaseDetails(widget.releaseID);
-     setStream();
+    setStream();
   }
+
   Future<bool> requestPermission() async {
     var status = await Permission.phone.request();
     return status.isGranted;
   }
+
   void setStream() {
     PhoneState.stream.listen((event) {
       setState(() {
         if (event.status == PhoneStateStatus.CALL_STARTED) {
           callStartTime = DateTime.now();
         } else if (event.status == PhoneStateStatus.CALL_ENDED) {
-
-
-
-
           if (callStartTime != null) {
-
             callDuration = DateTime.now().difference(callStartTime!);
-            api.callTrack(widget.dUserID, widget.releaseID, callStartTime!,callStartTime!.add(callDuration) , status.number!);
+            api.callTrack(widget.dUserID, widget.releaseID, callStartTime!,
+                callStartTime!.add(callDuration), status.number!);
             if (kDebugMode) {
               print('userId: ${widget.dUserID}');
             }
@@ -108,14 +105,14 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
       });
     });
   }
+
   void makePhoneCall(var phoneNumber) async {
     final url = Uri.parse('tel:$phoneNumber');
     if (await canLaunchUrl(url)) {
-       startTime = DateTime.now();
+      startTime = DateTime.now();
       await launchUrl(url);
-       endTime = DateTime.now();
-
-    }  else {
+      endTime = DateTime.now();
+    } else {
       // ignore: use_build_context_synchronously
       showDialog(
         context: context,
@@ -300,7 +297,8 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                         width: 5.0,
                                       ),
                                       Text(
-                                        snapshot.data!.releaseRequests!.cMobileNumber1!,
+                                        snapshot.data!.releaseRequests!
+                                            .cMobileNumber1!,
                                         style: const TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold),
@@ -322,58 +320,29 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                             MaterialButton(
                                               onPressed: !granted
                                                   ? () async {
-                                                bool temp = await requestPermission();
-                                                setState(() {
-                                                  granted = temp;
-                                                  if (granted) {
-                                                    setStream();
-                                                  }
-                                                });
-                                              }
+                                                      bool temp =
+                                                          await requestPermission();
+                                                      setState(() {
+                                                        granted = temp;
+                                                        if (granted) {
+                                                          setStream();
+                                                        }
+                                                      });
+                                                    }
                                                   : null,
-                                              child: const Text("Request permission of Phone"),
+                                              child: const Text(
+                                                  "Request permission of Phone"),
                                             );
                                           }
                                           final call = Uri.parse("tel:" +
-                                              snapshot.data!.releaseRequests!.cMobileNumber1!);
+                                              snapshot.data!.releaseRequests!
+                                                  .cMobileNumber1!);
 
                                           if (await canLaunchUrl(call)) {
                                             launchUrl(call);
                                           } else {
                                             throw 'Could not launch $call';
                                           }
-                                          // while (isCallEnded == false) {
-                                          //   await Future.delayed(const Duration(seconds: 30)); // Wait for 1 second before checking again
-                                          // }
-                                          //
-                                          // // await api.callTrack(
-                                          // //   widget.dUserID,
-                                          // //   snapshot.data!.releaseRequests!.orderId!,
-                                          // //   callStartTime!,
-                                          // //   callEndTime!,
-                                          // //   snapshot.data!.releaseRequests!.cMobileNumber1!,
-                                          // // );
-                                          //
-                                          //
-                                          // // else {
-                                          // //   showDialog(
-                                          // //     context: context,
-                                          // //     builder: (BuildContext context) {
-                                          // //       return AlertDialog(
-                                          // //         title: const Text('Error'),
-                                          // //         content: const Text('Please wait for the call to end before making the API call.'),
-                                          // //         actions: [
-                                          // //           TextButton(
-                                          // //             child: const Text('OK'),
-                                          // //             onPressed: () {
-                                          // //               Navigator.of(context).pop();
-                                          // //             },
-                                          // //           ),
-                                          // //         ],
-                                          // //       );
-                                          // //     },
-                                          // //   );
-                                          // // }
                                         },
                                         child: const Icon(
                                           Icons.call,
@@ -381,7 +350,10 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                           color: Colors.black,
                                         ),
                                       ),
-                                      if (status.status == PhoneStateStatus.CALL_INCOMING || status.status == PhoneStateStatus.CALL_STARTED)
+                                      if (status.status ==
+                                              PhoneStateStatus.CALL_INCOMING ||
+                                          status.status ==
+                                              PhoneStateStatus.CALL_STARTED)
                                         GestureDetector(
                                           onTap: () {
                                             if (status.number != null) {
@@ -390,22 +362,14 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                           },
                                           child: Text(
                                             "Number: ${status.number}",
-                                            style: const TextStyle(fontSize: 24, decoration: TextDecoration.underline),
+                                            style: const TextStyle(
+                                                fontSize: 24,
+                                                decoration:
+                                                    TextDecoration.underline),
                                           ),
                                         ),
-
                                     ],
                                   ),
-                                  Row(children: [
-                                     Text("مواعيد المكالمه: ${ DateTime.now()} ${ DateTime.now().add(callDuration)}" ,
-                                       style: const TextStyle(fontSize: 9),),
-
-                                  ]),
-                                  Row(children: [
-                                    Text("توقيت المكالمه: $callDuration" ,
-                                      style: const TextStyle(fontSize: 9),),
-
-                                  ]),
                                   if (snapshot.data!.releaseRequests!
                                           .cMobileNumber2 !=
                                       null)
@@ -429,7 +393,7 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                         ),
                                         Text(
                                           snapshot.data!.releaseRequests!
-                                              .cMobileNumber1!,
+                                              .cMobileNumber2!,
                                           style: const TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold),
@@ -443,7 +407,7 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                             backgroundColor: Colors.white,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
-                                              BorderRadius.circular(32.0),
+                                                  BorderRadius.circular(32.0),
                                             ),
                                           ),
                                           onPressed: () async {
@@ -451,16 +415,18 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                               MaterialButton(
                                                 onPressed: !granted
                                                     ? () async {
-                                                  bool temp = await requestPermission();
-                                                  // setState(() {
-                                                    granted = temp;
-                                                    if (granted) {
-                                                      setStream();
-                                                    }
-                                                  // });
-                                                }
+                                                        bool temp =
+                                                            await requestPermission();
+                                                        setState(() {
+                                                          granted = temp;
+                                                          if (granted) {
+                                                            setStream();
+                                                          }
+                                                        });
+                                                      }
                                                     : null,
-                                                child: const Text("Request permission of Phone"),
+                                                child: const Text(
+                                                    "Request permission of Phone"),
                                               );
                                             }
                                             final call = Uri.parse("tel:" +
@@ -472,19 +438,6 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                             } else {
                                               throw 'Could not launch $call';
                                             }
-                                            // setState(()  {
-                                            //   // api.callTrack(
-                                            //   //     widget.dUserID,
-                                            //   //     snapshot.data!.releaseRequests!
-                                            //   //         .orderId!,
-                                            //   //     DateTime.now(),
-                                            //   //     DateTime.now().difference(
-                                            //   //             callDuration
-                                            //   //                 as DateTime)
-                                            //   //         as DateTime,
-                                            //   //     snapshot.data!.releaseRequests!
-                                            //   //         .cMobileNumber1!);
-                                            // });
                                           },
                                           child: const Icon(
                                             Icons.call,
@@ -492,7 +445,11 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                             color: Colors.black,
                                           ),
                                         ),
-                                        if (status.status == PhoneStateStatus.CALL_INCOMING || status.status == PhoneStateStatus.CALL_STARTED)
+                                        if (status.status ==
+                                                PhoneStateStatus
+                                                    .CALL_INCOMING ||
+                                            status.status ==
+                                                PhoneStateStatus.CALL_STARTED)
                                           GestureDetector(
                                             onTap: () {
                                               if (status.number != null) {
@@ -501,13 +458,14 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                             },
                                             child: Text(
                                               "Number: ${status.number}",
-                                              style: const TextStyle(fontSize: 24, decoration: TextDecoration.underline),
+                                              style: const TextStyle(
+                                                  fontSize: 24,
+                                                  decoration:
+                                                      TextDecoration.underline),
                                             ),
                                           ),
-
                                       ],
                                     ),
-
                                   Row(
                                     children: [
                                       const Icon(
@@ -1192,9 +1150,14 @@ class _OTPAlertDialogState extends State<OTPAlertDialog> {
 }
 
 class DeliveredAlertDialog extends StatefulWidget {
-  const DeliveredAlertDialog({ Key? key, required this.driverUsername, required this.releaseID, required this.driverId, required this.userID})
+  const DeliveredAlertDialog(
+      {Key? key,
+      required this.driverUsername,
+      required this.releaseID,
+      required this.driverId,
+      required this.userID})
       : super(key: key);
-  final String driverUsername,userID;
+  final String driverUsername, userID;
   final int releaseID;
   final int driverId;
 
@@ -1204,7 +1167,7 @@ class DeliveredAlertDialog extends StatefulWidget {
 
 class _DeliveredAlertDialogState extends State<DeliveredAlertDialog> {
   int _releaseDeliveredYes = 0, _releaseDeliveredNo = 0;
-  API api =  API();
+  API api = API();
   final oTP = TextEditingController();
   String fileType = 'ALL';
   var fileTypeList = ['ALL'];
@@ -1213,6 +1176,7 @@ class _DeliveredAlertDialogState extends State<DeliveredAlertDialog> {
   PlatformFile? file;
   ServicesUtility servicesUtility = ServicesUtility();
   bool _isloading = false;
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -1275,8 +1239,7 @@ class _DeliveredAlertDialogState extends State<DeliveredAlertDialog> {
                             },
                             child: const Text('ارفع صوره اذن التسليم'),
                           ),
-                          if (file != null)
-                          fileDetails(file!),
+                          if (file != null) fileDetails(file!),
                           if (file != null)
                             ElevatedButton(
                               onPressed: () {
@@ -1291,26 +1254,28 @@ class _DeliveredAlertDialogState extends State<DeliveredAlertDialog> {
                                   _isloading = true;
                                 });
                                 // String res ;
-                                if (_releaseDeliveredYes == 1){
-                                  Position position = await servicesUtility.getLocation();
+                                if (_releaseDeliveredYes == 1) {
+                                  Position position =
+                                      await servicesUtility.getLocation();
                                   res = await api.doneDeliveryByUploadNote(
                                       widget.driverUsername,
                                       true,
                                       file!.path!,
                                       widget.releaseID,
-                                      true,position.latitude.toString(),position.longitude.toString()
-                                  );
-                                }
-
-                                else if(_releaseDeliveredNo == 1){
-                                  Position position = await servicesUtility.getLocation();
+                                      true,
+                                      position.latitude.toString(),
+                                      position.longitude.toString());
+                                } else if (_releaseDeliveredNo == 1) {
+                                  Position position =
+                                      await servicesUtility.getLocation();
                                   res = await api.doneDeliveryByUploadNote(
                                       widget.driverUsername,
                                       true,
                                       file!.path!,
                                       widget.releaseID,
-                                      false,position.latitude.toString(),position.longitude.toString()
-                                  );
+                                      false,
+                                      position.latitude.toString(),
+                                      position.longitude.toString());
                                 }
                                 if (res == "Done") {
                                   setState(() {
@@ -1319,11 +1284,13 @@ class _DeliveredAlertDialogState extends State<DeliveredAlertDialog> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(builder: (context) {
-                                      return  HomeScreen(driverUsername: widget.driverUsername,driverID: widget.driverId,dUserID: widget.userID);
+                                      return HomeScreen(
+                                          driverUsername: widget.driverUsername,
+                                          driverID: widget.driverId,
+                                          dUserID: widget.userID);
                                     }),
                                   );
-                                }
-                                else{
+                                } else {
                                   setState(() {
                                     _isloading = false;
                                   });
@@ -1335,10 +1302,13 @@ class _DeliveredAlertDialogState extends State<DeliveredAlertDialog> {
                                       backgroundColor: Colors.red,
                                       textColor: Colors.white,
                                       fontSize: 16.0);
-
                                 }
                               },
-                              child: _isloading ? const CircularProgressIndicator(color: Colors.white,) :const Text('تم'),
+                              child: _isloading
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white,
+                                    )
+                                  : const Text('تم'),
                             )
                         ],
                       ),
@@ -1381,7 +1351,6 @@ class _DeliveredAlertDialogState extends State<DeliveredAlertDialog> {
     );
   }
 
-
   void pickFiles(String filetype) async {
     var status = await Permission.camera.status;
     if (status.isDenied) {
@@ -1397,7 +1366,8 @@ class _DeliveredAlertDialogState extends State<DeliveredAlertDialog> {
     final result = await ImagePicker().pickImage(source: ImageSource.camera);
     if (result == null) return;
     final file = File(result.path);
-    final fileSize = await file.length(); // Retrieve file size using the File class
+    final fileSize =
+        await file.length(); // Retrieve file size using the File class
     final platformFile = PlatformFile(
       name: result.name,
       size: fileSize,
@@ -1410,10 +1380,12 @@ class _DeliveredAlertDialogState extends State<DeliveredAlertDialog> {
     });
     loadSelectedFiles([platformFile]);
   }
+
   void loadSelectedFiles(List<PlatformFile> files) {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => FileList(files: files, onOpenedFile: viewFile)));
   }
+
   void viewFile(PlatformFile file) {
     OpenFile.open(file.path);
   }
