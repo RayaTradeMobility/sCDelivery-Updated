@@ -1,14 +1,18 @@
-// ignore_for_file: unnecessary_null_comparison, file_names
+// ignore_for_file: unnecessary_null_comparison, file_names, non_constant_identifier_names
 
 import 'dart:io';
+import 'package:RayaExpressDriver/Services/File.dart';
 import 'package:collapsible/collapsible.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:RayaExpressDriver/API/API.dart';
 import 'package:RayaExpressDriver/Screens/HomeScreen.dart';
 import 'package:RayaExpressDriver/Services/ServicesUtililty.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:open_file/open_file.dart';
 import 'package:phone_state/phone_state.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../Constants/Constants.dart';
@@ -22,6 +26,7 @@ class ReleaseDetails extends StatefulWidget {
   final bool releaseNew;
   final int paymentStatus;
 
+
   const ReleaseDetails(
       {Key? key,
       required this.releaseID,
@@ -29,7 +34,7 @@ class ReleaseDetails extends StatefulWidget {
       required this.driverID,
       required this.driverUsername,
       required this.releaseNew,
-      required this.paymentStatus})
+      required this.paymentStatus,})
       : super(key: key);
 
   @override
@@ -38,35 +43,64 @@ class ReleaseDetails extends StatefulWidget {
 
 class _ReleaseDetailsState extends State<ReleaseDetails> {
   late Future<ReleaseDetailsModel> releaseDetails;
-  PhoneState status = PhoneState.nothing();
-  Duration callDuration = Duration.zero;
-  DateTime? callStartTime;
+
   API api = API();
   bool _collapse = false,
       _collapse2 = false,
       _collapse3 = false,
       _collapse4 = false;
 
+  PhoneState status = PhoneState.nothing();
+  Duration callDuration = Duration.zero;
+  DateTime? startTime;
+  DateTime? endTime;
+  DateTime? callStartTime;
+  DateTime? callEndTime;
+  bool granted = false;
+  bool isCallEnded =false;
+
   @override
   void initState() {
     super.initState();
     releaseDetails = api.getReleaseDetails(widget.releaseID);
+     setStream();
   }
-
   Future<bool> requestPermission() async {
     var status = await Permission.phone.request();
-
     return status.isGranted;
   }
-
   void setStream() {
     PhoneState.stream.listen((event) {
       setState(() {
         if (event.status == PhoneStateStatus.CALL_STARTED) {
           callStartTime = DateTime.now();
         } else if (event.status == PhoneStateStatus.CALL_ENDED) {
+
+
+
+
           if (callStartTime != null) {
+
             callDuration = DateTime.now().difference(callStartTime!);
+            api.callTrack(widget.dUserID, widget.releaseID, callStartTime!,callStartTime!.add(callDuration) , status.number!);
+            if (kDebugMode) {
+              print('userId: ${widget.dUserID}');
+            }
+            if (kDebugMode) {
+              print('Release Id: ${widget.releaseID}');
+            }
+            if (kDebugMode) {
+              print('call Duration:${callDuration.inSeconds}');
+            }
+            if (kDebugMode) {
+              print('Start Time: $callStartTime');
+            }
+            if (kDebugMode) {
+              print('EndTime: ${callStartTime!.add(callDuration)}');
+            }
+            if (kDebugMode) {
+              print('phone Number: ${status.number}');
+            }
             callStartTime = null;
           }
         }
@@ -74,12 +108,14 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
       });
     });
   }
-
   void makePhoneCall(var phoneNumber) async {
     final url = Uri.parse('tel:$phoneNumber');
     if (await canLaunchUrl(url)) {
+       startTime = DateTime.now();
       await launchUrl(url);
-    } else {
+       endTime = DateTime.now();
+
+    }  else {
       // ignore: use_build_context_synchronously
       showDialog(
         context: context,
@@ -264,8 +300,7 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                         width: 5.0,
                                       ),
                                       Text(
-                                        snapshot.data!.releaseRequests!
-                                            .cMobileNumber1!,
+                                        snapshot.data!.releaseRequests!.cMobileNumber1!,
                                         style: const TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold),
@@ -283,28 +318,62 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                           ),
                                         ),
                                         onPressed: () async {
+                                          if (Platform.isAndroid) {
+                                            MaterialButton(
+                                              onPressed: !granted
+                                                  ? () async {
+                                                bool temp = await requestPermission();
+                                                setState(() {
+                                                  granted = temp;
+                                                  if (granted) {
+                                                    setStream();
+                                                  }
+                                                });
+                                              }
+                                                  : null,
+                                              child: const Text("Request permission of Phone"),
+                                            );
+                                          }
                                           final call = Uri.parse("tel:" +
-                                              snapshot.data!.releaseRequests!
-                                                  .cMobileNumber1!);
+                                              snapshot.data!.releaseRequests!.cMobileNumber1!);
 
                                           if (await canLaunchUrl(call)) {
                                             launchUrl(call);
                                           } else {
                                             throw 'Could not launch $call';
                                           }
-                                          // setState(()  {
-                                          //   // api.callTrack(
-                                          //   //     widget.dUserID,
-                                          //   //     snapshot.data!.releaseRequests!
-                                          //   //         .orderId!,
-                                          //   //     DateTime.now(),
-                                          //   //     DateTime.now().difference(
-                                          //   //             callDuration
-                                          //   //                 as DateTime)
-                                          //   //         as DateTime,
-                                          //   //     snapshot.data!.releaseRequests!
-                                          //   //         .cMobileNumber1!);
-                                          // });
+                                          // while (isCallEnded == false) {
+                                          //   await Future.delayed(const Duration(seconds: 30)); // Wait for 1 second before checking again
+                                          // }
+                                          //
+                                          // // await api.callTrack(
+                                          // //   widget.dUserID,
+                                          // //   snapshot.data!.releaseRequests!.orderId!,
+                                          // //   callStartTime!,
+                                          // //   callEndTime!,
+                                          // //   snapshot.data!.releaseRequests!.cMobileNumber1!,
+                                          // // );
+                                          //
+                                          //
+                                          // // else {
+                                          // //   showDialog(
+                                          // //     context: context,
+                                          // //     builder: (BuildContext context) {
+                                          // //       return AlertDialog(
+                                          // //         title: const Text('Error'),
+                                          // //         content: const Text('Please wait for the call to end before making the API call.'),
+                                          // //         actions: [
+                                          // //           TextButton(
+                                          // //             child: const Text('OK'),
+                                          // //             onPressed: () {
+                                          // //               Navigator.of(context).pop();
+                                          // //             },
+                                          // //           ),
+                                          // //         ],
+                                          // //       );
+                                          // //     },
+                                          // //   );
+                                          // // }
                                         },
                                         child: const Icon(
                                           Icons.call,
@@ -312,10 +381,7 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                           color: Colors.black,
                                         ),
                                       ),
-                                      if (status.status ==
-                                              PhoneStateStatus.CALL_INCOMING ||
-                                          status.status ==
-                                              PhoneStateStatus.CALL_STARTED)
+                                      if (status.status == PhoneStateStatus.CALL_INCOMING || status.status == PhoneStateStatus.CALL_STARTED)
                                         GestureDetector(
                                           onTap: () {
                                             if (status.number != null) {
@@ -324,17 +390,21 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                           },
                                           child: Text(
                                             "Number: ${status.number}",
-                                            style: const TextStyle(
-                                                fontSize: 24,
-                                                decoration:
-                                                    TextDecoration.underline),
+                                            style: const TextStyle(fontSize: 24, decoration: TextDecoration.underline),
                                           ),
                                         ),
+
                                     ],
                                   ),
                                   Row(children: [
-                                    const Text("توقيت المكالمه: "),
-                                    Text('${callDuration.inSeconds}')
+                                     Text("مواعيد المكالمه: ${ DateTime.now()} ${ DateTime.now().add(callDuration)}" ,
+                                       style: const TextStyle(fontSize: 9),),
+
+                                  ]),
+                                  Row(children: [
+                                    Text("توقيت المكالمه: $callDuration" ,
+                                      style: const TextStyle(fontSize: 9),),
+
                                   ]),
                                   if (snapshot.data!.releaseRequests!
                                           .cMobileNumber2 !=
@@ -359,7 +429,7 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                         ),
                                         Text(
                                           snapshot.data!.releaseRequests!
-                                              .cMobileNumber2!,
+                                              .cMobileNumber1!,
                                           style: const TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold),
@@ -373,10 +443,26 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                             backgroundColor: Colors.white,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(32.0),
+                                              BorderRadius.circular(32.0),
                                             ),
                                           ),
                                           onPressed: () async {
+                                            if (Platform.isAndroid) {
+                                              MaterialButton(
+                                                onPressed: !granted
+                                                    ? () async {
+                                                  bool temp = await requestPermission();
+                                                  // setState(() {
+                                                    granted = temp;
+                                                    if (granted) {
+                                                      setStream();
+                                                    }
+                                                  // });
+                                                }
+                                                    : null,
+                                                child: const Text("Request permission of Phone"),
+                                              );
+                                            }
                                             final call = Uri.parse("tel:" +
                                                 snapshot.data!.releaseRequests!
                                                     .cMobileNumber2!);
@@ -406,11 +492,7 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                             color: Colors.black,
                                           ),
                                         ),
-                                        if (status.status ==
-                                                PhoneStateStatus
-                                                    .CALL_INCOMING ||
-                                            status.status ==
-                                                PhoneStateStatus.CALL_STARTED)
+                                        if (status.status == PhoneStateStatus.CALL_INCOMING || status.status == PhoneStateStatus.CALL_STARTED)
                                           GestureDetector(
                                             onTap: () {
                                               if (status.number != null) {
@@ -419,14 +501,13 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                             },
                                             child: Text(
                                               "Number: ${status.number}",
-                                              style: const TextStyle(
-                                                  fontSize: 24,
-                                                  decoration:
-                                                      TextDecoration.underline),
+                                              style: const TextStyle(fontSize: 24, decoration: TextDecoration.underline),
                                             ),
                                           ),
+
                                       ],
                                     ),
+
                                   Row(
                                     children: [
                                       const Icon(
@@ -1111,14 +1192,9 @@ class _OTPAlertDialogState extends State<OTPAlertDialog> {
 }
 
 class DeliveredAlertDialog extends StatefulWidget {
-  const DeliveredAlertDialog(
-      {Key? key,
-      required this.driverUsername,
-      required this.releaseID,
-      required this.driverId,
-      required this.userID})
+  const DeliveredAlertDialog({ Key? key, required this.driverUsername, required this.releaseID, required this.driverId, required this.userID})
       : super(key: key);
-  final String driverUsername, userID;
+  final String driverUsername,userID;
   final int releaseID;
   final int driverId;
 
@@ -1128,97 +1204,161 @@ class DeliveredAlertDialog extends StatefulWidget {
 
 class _DeliveredAlertDialogState extends State<DeliveredAlertDialog> {
   int _releaseDeliveredYes = 0, _releaseDeliveredNo = 0;
-  API api = API();
+  API api =  API();
   final oTP = TextEditingController();
   String fileType = 'ALL';
   var fileTypeList = ['ALL'];
-  PlatformFile file = PlatformFile(name: 'name', size: 0);
-  late FilePickerResult result;
+  FilePickerResult? result;
+  late String res;
+  PlatformFile? file;
   ServicesUtility servicesUtility = ServicesUtility();
-  bool isLoading = false;
-  final picker = ImagePicker();
-
-  Future<void> pickImage(ImageSource source) async {
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
-    if (pickedFile != null) {
-      setState(() {
-        file = PlatformFile(
-          name: pickedFile.path.split('/').last,
-          size: 0,
-          path: pickedFile.path,
-        );
-      });
-    }
-  }
-
+  bool _isloading = false;
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("برجاء الاجابه عن الاسئله الاتيه"),
-      content: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text('هل تم تسليم الفاتورة'),
-              Column(
+        title: const Text("برجاء الاجابه عن الاسئله الاتيه"),
+        content: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SingleChildScrollView(
+            child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  ListTile(
-                    title: const Text("نعم"),
-                    leading: Radio(
-                      value: 1,
-                      groupValue: _releaseDeliveredYes,
-                      activeColor: Colors.blue,
-                      onChanged: (value) {
-                        setState(() {
-                          _releaseDeliveredYes = value!;
-                          _releaseDeliveredNo = 0;
-                        });
-                      },
-                    ),
+                  const Text('هل تم تسليم الفاتورة'),
+                  Column(
+                    children: [
+                      ListTile(
+                        title: const Text("نعم"),
+                        leading: Radio(
+                          value: 1,
+                          groupValue: _releaseDeliveredYes,
+                          activeColor: Colors.blue,
+                          onChanged: (value) {
+                            setState(() {
+                              _releaseDeliveredYes = value!;
+                              _releaseDeliveredNo = 0;
+                            });
+                          },
+                        ),
+                      ),
+                      ListTile(
+                        title: const Text("لا"),
+                        leading: Radio(
+                          value: 1,
+                          groupValue: _releaseDeliveredNo,
+                          activeColor: Colors.blue,
+                          onChanged: (value) {
+                            setState(() {
+                              _releaseDeliveredNo = value!;
+                              _releaseDeliveredYes = 0;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                  ListTile(
-                    title: const Text("لا"),
-                    leading: Radio(
-                      value: 1,
-                      groupValue: _releaseDeliveredNo,
-                      activeColor: Colors.blue,
-                      onChanged: (value) {
-                        setState(() {
-                          _releaseDeliveredNo = value!;
-                          _releaseDeliveredYes = 0;
-                        });
-                      },
-                    ),
+
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () async {
+                              pickFiles(fileType);
+                              // await availableCameras().then((value) => Navigator.push(context,
+                              //     MaterialPageRoute(builder: (_) => CameraScreen(cameras: value))));
+                            },
+                            child: const Text('ارفع صوره اذن التسليم'),
+                          ),
+                          if (file != null)
+                          fileDetails(file!),
+                          if (file != null)
+                            ElevatedButton(
+                              onPressed: () {
+                                viewFile(file!);
+                              },
+                              child: const Text('اظهار الصورة المرفوعة'),
+                            ),
+                          if (file != null)
+                            TextButton(
+                              onPressed: () async {
+                                setState(() {
+                                  _isloading = true;
+                                });
+                                // String res ;
+                                if (_releaseDeliveredYes == 1){
+                                  Position position = await servicesUtility.getLocation();
+                                  res = await api.doneDeliveryByUploadNote(
+                                      widget.driverUsername,
+                                      true,
+                                      file!.path!,
+                                      widget.releaseID,
+                                      true,position.latitude.toString(),position.longitude.toString()
+                                  );
+                                }
+
+                                else if(_releaseDeliveredNo == 1){
+                                  Position position = await servicesUtility.getLocation();
+                                  res = await api.doneDeliveryByUploadNote(
+                                      widget.driverUsername,
+                                      true,
+                                      file!.path!,
+                                      widget.releaseID,
+                                      false,position.latitude.toString(),position.longitude.toString()
+                                  );
+                                }
+                                if (res == "Done") {
+                                  setState(() {
+                                    _isloading = false;
+                                  });
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) {
+                                      return  HomeScreen(driverUsername: widget.driverUsername,driverID: widget.driverId,dUserID: widget.userID);
+                                    }),
+                                  );
+                                }
+                                else{
+                                  setState(() {
+                                    _isloading = false;
+                                  });
+                                  Fluttertoast.showToast(
+                                      msg: res,
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.red,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0);
+
+                                }
+                              },
+                              child: _isloading ? const CircularProgressIndicator(color: Colors.white,) :const Text('تم'),
+                            )
+                        ],
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () => pickImage(ImageSource.camera),
-                child: const Text('Capture Image'),
-              ),
-              const SizedBox(height: 20),
-              if (file.path!.isNotEmpty) fileDetails(file),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // Perform your logic here
-                },
-                child: isLoading
-                    ? const CircularProgressIndicator(
-                        color: Colors.white,
-                      )
-                    : const Text('تم'),
-              ),
-            ],
+
+                  // TextButton(
+                  //   child: const Text("تم"),
+                  //   onPressed: (){
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(builder: (context) {
+                  //         return  HomeScreen(driverUsername: widget.driverUsername,driverID: widget.driverId,dUserID: widget.userID);
+                  //       }),
+                  //     );
+                  //   },
+                  // )
+                ]),
           ),
-        ),
-      ),
-    );
+        ));
   }
 
   Widget fileDetails(PlatformFile file) {
@@ -1239,5 +1379,42 @@ class _DeliveredAlertDialogState extends State<DeliveredAlertDialog> {
         ],
       ),
     );
+  }
+
+
+  void pickFiles(String filetype) async {
+    var status = await Permission.camera.status;
+    if (status.isDenied) {
+      // You can request multiple permissions at once.
+      Map<Permission, PermissionStatus> statuses = await [
+        Permission.camera,
+      ].request();
+      if (kDebugMode) {
+        print(statuses[Permission.camera]);
+      } // it should print PermissionStatus.granted
+    }
+
+    final result = await ImagePicker().pickImage(source: ImageSource.camera);
+    if (result == null) return;
+    final file = File(result.path);
+    final fileSize = await file.length(); // Retrieve file size using the File class
+    final platformFile = PlatformFile(
+      name: result.name,
+      size: fileSize,
+      path: result.path,
+      bytes: await result.readAsBytes(),
+    );
+    setState(() {
+      // Save the selected image file in the "file" variable
+      this.file = platformFile;
+    });
+    loadSelectedFiles([platformFile]);
+  }
+  void loadSelectedFiles(List<PlatformFile> files) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => FileList(files: files, onOpenedFile: viewFile)));
+  }
+  void viewFile(PlatformFile file) {
+    OpenFile.open(file.path);
   }
 }

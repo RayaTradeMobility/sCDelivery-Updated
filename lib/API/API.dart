@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -239,11 +241,11 @@ class API {
     }
   }
 
-  callTrack(String submitter, String orderId, DateTime startAt, DateTime endAt,
+  callTrack(String submitter, int releaseId, DateTime startAt, DateTime endAt,
       String mobileNumber) async {
     var headers = {
-      'Username': '<string>',
-      'Password': '<string>',
+      'Username': 'Logistics',
+      'Password': 'H51Qob<zRRQ/f@%^',
       'Content-Type': 'application/json'
     };
     var request = http.Request(
@@ -252,7 +254,7 @@ class API {
             'http://www.rayatrade.com/RayaLogisticsAPI/api/CallTracking/CreateShipment'));
     request.body = json.encode({
       "submitter": submitter,
-      "orderId": orderId,
+      "releaseId": releaseId,
       "classificationId": 1,
       "startAt": startAt,
       "endAt": endAt,
@@ -265,9 +267,16 @@ class API {
 
     if (response.statusCode == 200) {
       if (kDebugMode) {
+        print(request.body);
+      }
+      if (kDebugMode) {
         print(await response.stream.bytesToString());
       }
     } else {
+      if (kDebugMode) {
+        print(request.body);
+      }
+
       if (kDebugMode) {
         print(response.reasonPhrase);
       }
