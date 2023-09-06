@@ -23,7 +23,7 @@ class ReleaseDetails extends StatefulWidget {
   final int releaseID;
   final String dUserID, driverUsername;
   final int driverID;
-  final bool releaseNew;
+  final bool releaseNew , isUseOTP;
   final int paymentStatus;
 
   const ReleaseDetails({
@@ -33,7 +33,7 @@ class ReleaseDetails extends StatefulWidget {
     required this.driverID,
     required this.driverUsername,
     required this.releaseNew,
-    required this.paymentStatus,
+    required this.paymentStatus, required this.isUseOTP,
   }) : super(key: key);
 
   @override
@@ -169,23 +169,38 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                       ),
                       IconButton(
                         onPressed: () {
-                          api.getOTP(
-                              snapshot.data!.releaseRequests!.cMobileNumber1!,
-                              widget.releaseID);
-                          showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (BuildContext context) {
-                                return OTPAlertDialog(
-                                  driverID: widget.driverID,
-                                  dUserID: widget.dUserID,
-                                  mobileNumber: snapshot
-                                      .data!.releaseRequests!.cMobileNumber1!,
-                                  releaseID: snapshot
-                                      .data!.releaseRequests!.releaseId!,
-                                  userNameDriver: widget.dUserID,
-                                );
-                              });
+                          if(widget.isUseOTP == true) {
+                            api.getOTP(
+                                snapshot.data!.releaseRequests!.cMobileNumber1!,
+                                widget.releaseID);
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return OTPAlertDialog(
+                                    driverID: widget.driverID,
+                                    dUserID: widget.dUserID,
+                                    mobileNumber: snapshot
+                                        .data!.releaseRequests!.cMobileNumber1!,
+                                    releaseID: snapshot
+                                        .data!.releaseRequests!.releaseId!,
+                                    userNameDriver: widget.dUserID,
+                                  );
+                                });
+                          }
+                          else{
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return DeliveredAlertDialog(
+                                    driverUsername: widget.driverUsername,
+                                    driverId: widget.driverID,
+                                    userID: widget.dUserID,
+                                    releaseID: widget.releaseID,
+                                  );
+                                });
+                          }
                         },
                         icon: const Icon(
                           Icons.done,

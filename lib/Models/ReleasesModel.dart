@@ -63,6 +63,7 @@ class ReleaseRequests {
   String? rAttachedFile;
   String? rRejectionReason;
   String? oAwbUniqueNumber;
+  bool? isUseOTP;
   bool? isCanceled;
   bool? isDelivered;
   int? shipmentTypeId;
@@ -85,6 +86,7 @@ class ReleaseRequests {
       this.rAttachedFile,
       this.rRejectionReason,
       this.oAwbUniqueNumber,
+      this.isUseOTP,
       this.isCanceled,
       this.isDelivered,
       this.shipmentTypeId,
@@ -107,6 +109,7 @@ class ReleaseRequests {
     rAttachedFile = json['rAttachedFile'];
     rRejectionReason = json['rRejectionReason'];
     oAwbUniqueNumber = json['oAwbUniqueNumber'];
+    isUseOTP = json['isUseOTP'];
     isCanceled = json['isCanceled'];
     isDelivered = json['isDelivered'];
     shipmentTypeId = json['shipmentTypeId'];
@@ -131,6 +134,7 @@ class ReleaseRequests {
     data['rAttachedFile'] = rAttachedFile;
     data['rRejectionReason'] = rRejectionReason;
     data['oAwbUniqueNumber'] = oAwbUniqueNumber;
+    data['isUseOTP'] = isUseOTP;
     data['isCanceled'] = isCanceled;
     data['isDelivered'] = isDelivered;
     data['shipmentTypeId'] = shipmentTypeId;

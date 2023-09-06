@@ -40,7 +40,7 @@ class ReleasesCard extends StatefulWidget {
       required this.driverUsername,
       required this.releasenew,
       required this.paymentstatus,
-      required this.oSystemStatusID});
+      required this.oSystemStatusID, required this.isUseOTP});
 
   final int? paymentstatus, oSystemStatusID;
   final String dUserID,
@@ -52,7 +52,7 @@ class ReleasesCard extends StatefulWidget {
       driverUsername,
       orderID;
   final int driverID, releaseID, rShipmentID;
-  final bool releasenew;
+  final bool releasenew , isUseOTP;
 
   @override
   State<ReleasesCard> createState() => _ReleasesCardState();
@@ -82,7 +82,7 @@ class _ReleasesCardState extends State<ReleasesCard> {
                     driverID: widget.driverID,
                     releaseID: widget.releaseID,
                     dUserID: widget.dUserID,
-                    paymentStatus: widget.paymentstatus ?? 0,
+                    paymentStatus: widget.paymentstatus ?? 0, isUseOTP: widget.isUseOTP,
                   );
                 }),
               );
