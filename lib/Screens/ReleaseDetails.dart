@@ -1363,7 +1363,7 @@ class _DeliveredAlertDialogState extends State<DeliveredAlertDialog> {
       } // it should print PermissionStatus.granted
     }
 
-    final result = await ImagePicker().pickImage(source: ImageSource.camera);
+    final result = await ImagePicker().pickImage(source: ImageSource.camera , imageQuality: 25);
     if (result == null) return;
     final file = File(result.path);
     final fileSize =
