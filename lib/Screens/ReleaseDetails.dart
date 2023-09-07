@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_null_comparison, file_names, non_constant_identifier_names
 
+import 'dart:convert';
 import 'dart:io';
 import 'package:RayaExpressDriver/Services/File.dart';
 import 'package:collapsible/collapsible.dart';
@@ -18,12 +19,15 @@ import 'package:url_launcher/url_launcher.dart';
 import '../Constants/Constants.dart';
 import '../Models/ReleaseDetailsModel.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:http/http.dart' as http;
 
 class ReleaseDetails extends StatefulWidget {
   final int releaseID;
   final String dUserID, driverUsername;
   final int driverID;
-  final bool releaseNew , isUseOTP;
+  final bool releaseNew;
+
+  // final bool isUseOTP;
   final int paymentStatus;
 
   const ReleaseDetails({
@@ -33,7 +37,8 @@ class ReleaseDetails extends StatefulWidget {
     required this.driverID,
     required this.driverUsername,
     required this.releaseNew,
-    required this.paymentStatus, required this.isUseOTP,
+    required this.paymentStatus,
+    // required this.isUseOTP,
   }) : super(key: key);
 
   @override
@@ -78,8 +83,10 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
         } else if (event.status == PhoneStateStatus.CALL_ENDED) {
           if (callStartTime != null) {
             callDuration = DateTime.now().difference(callStartTime!);
-            api.callTrack(widget.dUserID, widget.releaseID, callStartTime!.toString(),
-                callStartTime!.add(callDuration).toString(), status.number!);
+            String end = callStartTime!.add(callDuration).toString();
+            String start = callStartTime!.toString();
+            api.callTrack(
+                widget.dUserID, widget.releaseID, start, end, status.number!);
             if (kDebugMode) {
               print('userId: ${widget.dUserID}');
             }
@@ -169,38 +176,38 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                       ),
                       IconButton(
                         onPressed: () {
-                          if(widget.isUseOTP == true) {
-                            api.getOTP(
-                                snapshot.data!.releaseRequests!.cMobileNumber1!,
-                                widget.releaseID);
-                            showDialog(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return OTPAlertDialog(
-                                    driverID: widget.driverID,
-                                    dUserID: widget.dUserID,
-                                    mobileNumber: snapshot
-                                        .data!.releaseRequests!.cMobileNumber1!,
-                                    releaseID: snapshot
-                                        .data!.releaseRequests!.releaseId!,
-                                    userNameDriver: widget.dUserID,
-                                  );
-                                });
-                          }
-                          else{
-                            showDialog(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return DeliveredAlertDialog(
-                                    driverUsername: widget.driverUsername,
-                                    driverId: widget.driverID,
-                                    userID: widget.dUserID,
-                                    releaseID: widget.releaseID,
-                                  );
-                                });
-                          }
+                          // if(widget.isUseOTP == true) {
+                          api.getOTP(
+                              snapshot.data!.releaseRequests!.cMobileNumber1!,
+                              widget.releaseID);
+                          showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (BuildContext context) {
+                                return OTPAlertDialog(
+                                  driverID: widget.driverID,
+                                  dUserID: widget.dUserID,
+                                  mobileNumber: snapshot
+                                      .data!.releaseRequests!.cMobileNumber1!,
+                                  releaseID: snapshot
+                                      .data!.releaseRequests!.releaseId!,
+                                  userNameDriver: widget.dUserID,
+                                );
+                              });
+                          // }
+                          // else{
+                          //   showDialog(
+                          //       barrierDismissible: false,
+                          //       context: context,
+                          //       builder: (BuildContext context) {
+                          //         return DeliveredAlertDialog(
+                          //           driverUsername: widget.driverUsername,
+                          //           driverId: widget.driverID,
+                          //           userID: widget.dUserID,
+                          //           releaseID: widget.releaseID,
+                          //         );
+                          //       });
+                          // }
                         },
                         icon: const Icon(
                           Icons.done,
@@ -950,7 +957,7 @@ class NotDileveredAlert extends StatefulWidget {
 class _NotDileveredAlertState extends State<NotDileveredAlert> {
   bool _isloading = false;
   API api = API();
-  String reason = 'العميل رفض';
+  String reason = 'All';
   var reasonList = [
     'العميل رفض',
     'حالة البضاعة',
@@ -969,6 +976,35 @@ class _NotDileveredAlertState extends State<NotDileveredAlert> {
     'رفض بسبب السعر',
     'اختلاف بيانات العميل'
   ];
+  String idValue = '';
+  String rejectValue = "";
+  List<String> rejectID = [''];
+  List<String> rejectName = [''];
+
+  Future<void> fetchRejectReason() async {
+    var url = Uri.parse(
+        'http://www.rayatrade.com/RayaLogisticsAPI/api/shipmentStatus/All-Delivery-Rejection-Reason');
+    var response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      var jsonData = json.decode(response.body);
+
+      setState(() {
+        rejectName =
+            List<String>.from(jsonData['reasons'].map((x) => x['reason']));
+        rejectID = List<String>.from(
+            jsonData['reasons'].map((x) => x['id'].toString()));
+        rejectValue = rejectName.first;
+        idValue = rejectID.first;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchRejectReason();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -985,27 +1021,33 @@ class _NotDileveredAlertState extends State<NotDileveredAlert> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                DropdownButton(
-                  value: reason,
-                  items: reasonList.map((String type) {
-                    return DropdownMenuItem(
-                        value: type,
-                        alignment: Alignment.center,
-                        enabled: true,
-                        child: Center(
-                          child: Text(
-                            type,
-                            textDirection: TextDirection.rtl,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 8),
-                          ),
-                        ));
-                  }).toList(),
-                  onChanged: (value) {
+                DropdownButton<String>(
+                  value: rejectValue,
+                  itemHeight: null,
+                  menuMaxHeight: 292,
+                  borderRadius: BorderRadius.circular(10),
+                  alignment: AlignmentDirectional.center,
+                  icon: const Icon(Icons.arrow_drop_down_sharp),
+                  elevation: 0,
+                  style: const TextStyle(color: Colors.white),
+                  onChanged: (String? newValue) {
                     setState(() {
-                      reason = value!;
+                      rejectValue = newValue!;
+                      idValue = rejectID[rejectName.indexOf(rejectValue)];
                     });
                   },
+                  items: rejectName.map<DropdownMenuItem<String>>(
+                    (String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.59,
+                          height: MediaQuery.of(context).size.height / 20,
+                          child: Center(child: Text(value)),
+                        ),
+                      );
+                    },
+                  ).toList(),
                 ),
                 ElevatedButton(
                     onPressed: () async {
@@ -1013,7 +1055,7 @@ class _NotDileveredAlertState extends State<NotDileveredAlert> {
                         _isloading = true;
                       });
                       String res = await api.rejectDelivery(
-                          widget.driverUsername, widget.releaseID, reason);
+                          widget.driverUsername, widget.releaseID, rejectValue);
                       try {
                         if (res == "Done") {
                           setState(() {
@@ -1378,7 +1420,8 @@ class _DeliveredAlertDialogState extends State<DeliveredAlertDialog> {
       } // it should print PermissionStatus.granted
     }
 
-    final result = await ImagePicker().pickImage(source: ImageSource.camera , imageQuality: 25);
+    final result = await ImagePicker()
+        .pickImage(source: ImageSource.camera, imageQuality: 25);
     if (result == null) return;
     final file = File(result.path);
     final fileSize =

@@ -1,5 +1,7 @@
 // ignore_for_file: import_of_legacy_library_into_null_safe, file_names
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
@@ -8,6 +10,7 @@ import 'package:RayaExpressDriver/Services/ServicesUtililty.dart';
 import '../API/API.dart';
 import '../Models/PickupModel.dart';
 import '../Screens/PickupScreen.dart';
+import 'package:http/http.dart' as http;
 
 const fontColor = Color(0xFF031639);
 
@@ -40,7 +43,9 @@ class ReleasesCard extends StatefulWidget {
       required this.driverUsername,
       required this.releasenew,
       required this.paymentstatus,
-      required this.oSystemStatusID, required this.isUseOTP});
+      required this.oSystemStatusID,
+        // required this.isUseOTP
+      });
 
   final int? paymentstatus, oSystemStatusID;
   final String dUserID,
@@ -52,7 +57,8 @@ class ReleasesCard extends StatefulWidget {
       driverUsername,
       orderID;
   final int driverID, releaseID, rShipmentID;
-  final bool releasenew , isUseOTP;
+  final bool releasenew  ;
+  // final bool isUseOTP;
 
   @override
   State<ReleasesCard> createState() => _ReleasesCardState();
@@ -82,7 +88,8 @@ class _ReleasesCardState extends State<ReleasesCard> {
                     driverID: widget.driverID,
                     releaseID: widget.releaseID,
                     dUserID: widget.dUserID,
-                    paymentStatus: widget.paymentstatus ?? 0, isUseOTP: widget.isUseOTP,
+                    paymentStatus: widget.paymentstatus ?? 0,
+                    // isUseOTP: widget.isUseOTP,
                   );
                 }),
               );
@@ -661,6 +668,29 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
   API api = API();
   ServicesUtility servicesUtility = ServicesUtility();
 
+  String idValue = '';
+  String rejectValue = "";
+  List<String> rejectID = [''];
+  List<String> rejectName = [''];
+
+  Future<void> fetchRejectReason() async {
+    var url = Uri.parse(
+        'http://www.rayatrade.com/RayaLogisticsAPI/api/shipmentStatus/All-pickup-Rejection-Reason');
+    var response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      var jsonData = json.decode(response.body);
+
+      setState(() {
+        rejectName =
+        List<String>.from(jsonData['reasons'].map((x) => x['reason']));
+        rejectID = List<String>.from(
+            jsonData['reasons'].map((x) => x['id'].toString()));
+        rejectValue = rejectName.first;
+        idValue = rejectID.first;
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -672,29 +702,39 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextFormField(
-                  controller: rejectionController,
-                  keyboardType: TextInputType.text,
-                  decoration: InputDecoration(
-                      filled: true,
-                      //<-- SEE HERE
-                      fillColor: Colors.white,
-                      hintText: "سبب الرفض",
-                      enabledBorder: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                        borderSide: BorderSide(
-                          color: Colors.blueGrey,
+                DropdownButton<String>(
+                  value: rejectValue,
+                  itemHeight: null,
+                  menuMaxHeight: 292,
+                  borderRadius: BorderRadius.circular(10),
+                  alignment: AlignmentDirectional.center,
+                  icon: const Icon(Icons.arrow_drop_down_sharp),
+                  elevation: 0,
+                  style: const TextStyle(color: Colors.white),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      rejectValue = newValue!;
+                      idValue = rejectID[rejectName.indexOf(rejectValue)];
+                    });
+                  },
+                  items: rejectName.map<DropdownMenuItem<String>>(
+                        (String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.59,
+                          height: MediaQuery.of(context).size.height / 20,
+                          child: Center(child: Text(value)),
                         ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      )),
+                      );
+                    },
+                  ).toList(),
                 ),
                 ElevatedButton(
                     onPressed: () async {
                       Position pos = await servicesUtility.getLocation();
                       PickupModel acted = await api.putActionPick(
-                          rejectionController.text,
+                          rejectValue,
                           widget.scheduleID,
                           false,
                           pos.latitude.toString(),

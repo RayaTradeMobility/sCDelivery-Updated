@@ -215,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen>
                                               orderID: r.orderId!,
                                               releaseID: r.releaseId!,
                                               rShipmentID: r.rShipmentId!,
-                                              isUseOTP: r.isUseOTP!,
+                                              // isUseOTP: r.isUseOTP!,
                                               driverID: widget.driverID,
                                               dUserID: widget.dUserID,
                                               paymentstatus: r.paymentStatusID,
@@ -275,7 +275,8 @@ class _HomeScreenState extends State<HomeScreen>
                                               driverID: widget.driverID,
                                               dUserID: widget.dUserID,
                                               paymentstatus: 0,
-                                              oSystemStatusID: 0, isUseOTP: r.isUseOTP!,
+                                              oSystemStatusID: 0,
+                                              // isUseOTP: r.isUseOTP!,
                                               
                                             ),
                                         ],

@@ -51,7 +51,7 @@ class API {
       String deviceVersion) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var headers = {
-      'Username': 'Logistics',
+        'Username': 'Logistics',
       'Password': 'H51Qob<zRRQ/f@%^',
       'Content-Type': 'application/json'
     };
@@ -248,21 +248,16 @@ class API {
       'Password': 'H51Qob<zRRQ/f@%^',
       'Content-Type': 'application/json'
     };
-    var request = http.Request(
-        'POST',
-        Uri.parse(
-            'http://www.rayatrade.com/RayaLogisticsAPI/api/CallTracking/CreateShipment'));
+    var request = http.Request('POST', Uri.parse('http://www.rayatrade.com/RayaLogisticsAPI/api/CallTracking/AddCallTracking'));
     request.body = json.encode({
-      {
-        "submitter": submitter,
-        "releaseId": releaseId,
-        "classificationId": 1,
-        "startAt": startAt,
-        "endAt": endAt,
-        "comment": "",
-        "recordPath": "",
-        "mobileNumber": mobileNumber
-      }
+      "submitter": submitter,
+      "releaseId": releaseId,
+      "classificationId": 1,
+      "startAt": startAt,
+      "endAt": endAt,
+      "comment": "",
+      "recordPath": "",
+      "mobileNumber": mobileNumber
     });
     request.headers.addAll(headers);
 
@@ -270,16 +265,10 @@ class API {
 
     if (response.statusCode == 200) {
       if (kDebugMode) {
-        print(request.body);
-      }
-      if (kDebugMode) {
         print(await response.stream.bytesToString());
       }
-    } else {
-      if (kDebugMode) {
-        print(request.body);
-      }
-
+    }
+    else {
       if (kDebugMode) {
         print(response.reasonPhrase);
       }
