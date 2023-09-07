@@ -734,46 +734,48 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
                 ),
                 ElevatedButton(
                     onPressed: () async {
-                      Position pos = await servicesUtility.getLocation();
-                      PickupModel acted = await api.putActionPick(
-                          rejectValue,
-                          widget.scheduleID,
-                          false,
-                          pos.latitude.toString(),
-                          pos.longitude.toString());
-                      if (acted.headerInfo?.message == "Success") {
-                        Fluttertoast.showToast(
-                            msg: 'Done',
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.CENTER,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.red,
-                            textColor: Colors.white,
-                            fontSize: 16.0);
+                      if (rejectValue != null && rejectValue != '') {
+                        Position pos = await servicesUtility.getLocation();
+                        PickupModel acted = await api.putActionPick(
+                            rejectValue,
+                            widget.scheduleID,
+                            false,
+                            pos.latitude.toString(),
+                            pos.longitude.toString());
+                        if (acted.headerInfo?.message == "Success") {
+                          Fluttertoast.showToast(
+                              msg: 'Done',
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
 
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) {
-                            return PickupScreen(
-                              driverUsername: widget.driverUsername,
-                              dUserID: widget.dUserID.toString(),
-                              driverID: widget.driverID,
-                              aWB: '',
-                            );
-                            // return QRViewExample();
-                          }),
-                        );
-                      } else {
-                        Fluttertoast.showToast(
-                            msg:
-                                acted.headerInfo?.message.toString() ?? 'Error',
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.CENTER,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.red,
-                            textColor: Colors.white,
-                            fontSize: 16.0);
-                      }
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) {
+                              return PickupScreen(
+                                driverUsername: widget.driverUsername,
+                                dUserID: widget.dUserID.toString(),
+                                driverID: widget.driverID,
+                                aWB: '',
+                              );
+                              // return QRViewExample();
+                            }),
+                          );
+                        } else {
+                          Fluttertoast.showToast(
+                              msg: acted.headerInfo?.message.toString() ??
+                                  'Error',
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
+                        }
+                      } else {}
                     },
                     child: const Text('تم'))
               ]),

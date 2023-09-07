@@ -7,7 +7,6 @@ import '../Constants/Constants.dart';
 import 'MenuScreen.dart';
 import 'QRCodeScreen.dart';
 
-
 class PickupScreen extends StatefulWidget {
   const PickupScreen(
       {super.key,

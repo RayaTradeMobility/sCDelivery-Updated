@@ -1017,7 +1017,6 @@ class _NotDileveredAlertState extends State<NotDileveredAlert> {
         content: Padding(
           padding: const EdgeInsets.all(2.0),
           child: Column(
-
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
@@ -1052,40 +1051,53 @@ class _NotDileveredAlertState extends State<NotDileveredAlert> {
                 ),
                 ElevatedButton(
                     onPressed: () async {
-                      setState(() {
-                        _isloading = true;
-                      });
-                      String res = await api.rejectDelivery(
-                          widget.driverUsername, widget.releaseID, rejectValue);
-                      try {
-                        if (res == "Done") {
-                          setState(() {
-                            _isloading = false;
-                          });
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) {
-                              return HomeScreen(
-                                  driverUsername: widget.driverUsername,
-                                  driverID: widget.driverId,
-                                  dUserID: widget.userID);
-                            }),
-                          );
-                        } else {
-                          Fluttertoast.showToast(
-                              msg: res,
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.CENTER,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.red,
-                              textColor: Colors.white,
-                              fontSize: 16.0);
-                          setState(() {
-                            _isloading = false;
-                          });
+                      if (rejectValue != null && rejectValue != "") {
+                        setState(() {
+                          _isloading = true;
+                        });
+                        String res = await api.rejectDelivery(
+                            widget.driverUsername,
+                            widget.releaseID,
+                            rejectValue);
+                        try {
+                          if (res == "Done") {
+                            setState(() {
+                              _isloading = false;
+                            });
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) {
+                                return HomeScreen(
+                                    driverUsername: widget.driverUsername,
+                                    driverID: widget.driverId,
+                                    dUserID: widget.userID);
+                              }),
+                            );
+                          } else {
+                            Fluttertoast.showToast(
+                                msg: res,
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.CENTER,
+                                timeInSecForIosWeb: 1,
+                                backgroundColor: Colors.red,
+                                textColor: Colors.white,
+                                fontSize: 16.0);
+                            setState(() {
+                              _isloading = false;
+                            });
+                          }
+                        } on SocketException catch (_) {
+                          rethrow;
                         }
-                      } on SocketException catch (_) {
-                        rethrow;
+                      } else {
+                        Fluttertoast.showToast(
+                            msg: "اختر سبب الرفض",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0);
                       }
                     },
                     child: _isloading
