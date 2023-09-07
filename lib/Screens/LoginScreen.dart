@@ -213,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         final tokenFcm =
                             await FirebaseMessaging.instance.getToken();
                         // String deviceid = await deviceID.getId();
-                        String deviceid =  'RSR1.201013.001';
+                        String deviceid = 'RSR1.201013.001';
                         UserModel user = await api.login(
                           username.text,
                           password.text,
