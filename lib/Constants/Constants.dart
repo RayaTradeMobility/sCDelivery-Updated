@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
@@ -44,7 +45,7 @@ class ReleasesCard extends StatefulWidget {
     required this.releasenew,
     required this.paymentstatus,
     required this.oSystemStatusID,
-    // required this.isUseOTP
+    required this.isUseOTP
   });
 
   final int? paymentstatus, oSystemStatusID;
@@ -59,7 +60,7 @@ class ReleasesCard extends StatefulWidget {
   final int driverID, releaseID, rShipmentID;
   final bool releasenew;
 
-  // final bool isUseOTP;
+  final bool isUseOTP;
 
   @override
   State<ReleasesCard> createState() => _ReleasesCardState();
@@ -90,7 +91,7 @@ class _ReleasesCardState extends State<ReleasesCard> {
                     releaseID: widget.releaseID,
                     dUserID: widget.dUserID,
                     paymentStatus: widget.paymentstatus ?? 0,
-                    // isUseOTP: widget.isUseOTP,
+                    isUseOTP: widget.isUseOTP,
                   );
                 }),
               );
@@ -675,16 +676,23 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
   List<String> rejectName = [''];
 
   Future<void> fetchRejectReason() async {
-    var url = Uri.parse(
-        'http://www.rayatrade.com/RayaLogisticsAPI/api/shipmentStatus/All-pickup-Rejection-Reason');
-    var response = await http.get(url);
+    var request = http.Request('GET', Uri.parse('http://www.rayatrade.com/RayaLogisticsAPI/api/shipmentStatus/All-Delivery-Rejection-Reason'));
+    var headers = {
+      'Username': 'Logistics',
+      'Password': 'H51Qob<zRRQ/f@%^'
+    };
+    request.headers.addAll(headers);
 
+    var response = await request.send();
     if (response.statusCode == 200) {
-      var jsonData = json.decode(response.body);
+      var jsonData = json.decode(await response.stream.bytesToString());
 
+      if (kDebugMode) {
+        print(jsonData);
+      }
       setState(() {
         rejectName =
-            List<String>.from(jsonData['reasons'].map((x) => x['reason']));
+        List<String>.from(jsonData['reasons'].map((x) => x['reason'].toString()));
         rejectID = List<String>.from(
             jsonData['reasons'].map((x) => x['id'].toString()));
         rejectValue = rejectName.first;
@@ -734,7 +742,7 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
                 ),
                 ElevatedButton(
                     onPressed: () async {
-                      if (rejectValue != null && rejectValue != '') {
+                      if (rejectValue != '') {
                         Position pos = await servicesUtility.getLocation();
                         PickupModel acted = await api.putActionPick(
                             rejectValue,

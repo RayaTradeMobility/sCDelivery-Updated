@@ -27,7 +27,7 @@ class ReleaseDetails extends StatefulWidget {
   final int driverID;
   final bool releaseNew;
 
-  // final bool isUseOTP;
+  final bool isUseOTP;
   final int paymentStatus;
 
   const ReleaseDetails({
@@ -38,7 +38,7 @@ class ReleaseDetails extends StatefulWidget {
     required this.driverUsername,
     required this.releaseNew,
     required this.paymentStatus,
-    // required this.isUseOTP,
+    required this.isUseOTP,
   }) : super(key: key);
 
   @override
@@ -176,7 +176,7 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                       ),
                       IconButton(
                         onPressed: () {
-                          // if(widget.isUseOTP == true) {
+                          if(widget.isUseOTP == true) {
                           api.getOTP(
                               snapshot.data!.releaseRequests!.cMobileNumber1!,
                               widget.releaseID);
@@ -194,20 +194,20 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                   userNameDriver: widget.dUserID,
                                 );
                               });
-                          // }
-                          // else{
-                          //   showDialog(
-                          //       barrierDismissible: false,
-                          //       context: context,
-                          //       builder: (BuildContext context) {
-                          //         return DeliveredAlertDialog(
-                          //           driverUsername: widget.driverUsername,
-                          //           driverId: widget.driverID,
-                          //           userID: widget.dUserID,
-                          //           releaseID: widget.releaseID,
-                          //         );
-                          //       });
-                          // }
+                          }
+                          else{
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return DeliveredAlertDialog(
+                                    driverUsername: widget.driverUsername,
+                                    driverId: widget.driverID,
+                                    userID: widget.dUserID,
+                                    releaseID: widget.releaseID,
+                                  );
+                                });
+                          }
                         },
                         icon: const Icon(
                           Icons.done,
@@ -982,16 +982,23 @@ class _NotDileveredAlertState extends State<NotDileveredAlert> {
   List<String> rejectName = [''];
 
   Future<void> fetchRejectReason() async {
-    var url = Uri.parse(
-        'http://www.rayatrade.com/RayaLogisticsAPI/api/shipmentStatus/All-Delivery-Rejection-Reason');
-    var response = await http.get(url);
+    var request = http.Request('GET', Uri.parse('http://www.rayatrade.com/RayaLogisticsAPI/api/shipmentStatus/All-Delivery-Rejection-Reason'));
+    var headers = {
+      'Username': 'Logistics',
+      'Password': 'H51Qob<zRRQ/f@%^'
+    };
+    request.headers.addAll(headers);
 
+    var response = await request.send();
     if (response.statusCode == 200) {
-      var jsonData = json.decode(response.body);
+      var jsonData = json.decode(await response.stream.bytesToString());
 
+      if (kDebugMode) {
+        print(jsonData);
+      }
       setState(() {
         rejectName =
-            List<String>.from(jsonData['reasons'].map((x) => x['reason']));
+            List<String>.from(jsonData['reasons'].map((x) => x['reason'].toString()));
         rejectID = List<String>.from(
             jsonData['reasons'].map((x) => x['id'].toString()));
         rejectValue = rejectName.first;
@@ -1029,7 +1036,7 @@ class _NotDileveredAlertState extends State<NotDileveredAlert> {
                   alignment: AlignmentDirectional.center,
                   icon: const Icon(Icons.arrow_drop_down_sharp),
                   elevation: 0,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.black),
                   onChanged: (String? newValue) {
                     setState(() {
                       rejectValue = newValue!;
