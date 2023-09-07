@@ -678,7 +678,7 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
     var request = http.Request(
         'GET',
         Uri.parse(
-            'http://www.rayatrade.com/RayaLogisticsAPI/api/shipmentStatus/All-Delivery-Rejection-Reason'));
+            'http://www.rayatrade.com/RayaLogisticsAPI/api/shipmentStatus/All-pickup-Rejection-Reason'));
     var headers = {'Username': 'Logistics', 'Password': 'H51Qob<zRRQ/f@%^'};
     request.headers.addAll(headers);
 
@@ -701,6 +701,12 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    fetchRejectReason();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AlertDialog(
         title: const Center(child: Text("سبب الرفض")),
@@ -719,7 +725,7 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
                   alignment: AlignmentDirectional.center,
                   icon: const Icon(Icons.arrow_drop_down_sharp),
                   elevation: 0,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.black),
                   onChanged: (String? newValue) {
                     setState(() {
                       rejectValue = newValue!;
@@ -727,11 +733,11 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
                     });
                   },
                   items: rejectName.map<DropdownMenuItem<String>>(
-                    (String value) {
+                        (String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.59,
+                          width: MediaQuery.of(context).size.width * 0.52,
                           height: MediaQuery.of(context).size.height / 20,
                           child: Center(child: Text(value)),
                         ),
@@ -739,6 +745,7 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
                     },
                   ).toList(),
                 ),
+
                 ElevatedButton(
                     onPressed: () async {
                       if (rejectValue != '') {
@@ -782,7 +789,16 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
                               textColor: Colors.white,
                               fontSize: 16.0);
                         }
-                      } else {}
+                      } else {
+                        Fluttertoast.showToast(
+                            msg: "اختر سبب الرفض",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0);
+                      }
                     },
                     child: const Text('تم'))
               ]),

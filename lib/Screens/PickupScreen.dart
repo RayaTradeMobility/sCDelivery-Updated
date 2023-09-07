@@ -99,8 +99,9 @@ class _PickupScreenState extends State<PickupScreen>
                             return const Text('لا يوجد تحميلات حتي الان');
                           }
                         } else if (snapshot.hasError) {
-                          return Text('${snapshot.error}'
-                              "You don't have data in this time");
+                          // return Text('${snapshot.error}'
+                          //     "You don't have data in this time");
+                          return const Text('Something Went wrong');
                         }
                         return const Center(child: CircularProgressIndicator());
                       },
