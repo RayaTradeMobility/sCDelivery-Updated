@@ -176,26 +176,25 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                       ),
                       IconButton(
                         onPressed: () {
-                          if(widget.isUseOTP == true) {
-                          api.getOTP(
-                              snapshot.data!.releaseRequests!.cMobileNumber1!,
-                              widget.releaseID);
-                          showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (BuildContext context) {
-                                return OTPAlertDialog(
-                                  driverID: widget.driverID,
-                                  dUserID: widget.dUserID,
-                                  mobileNumber: snapshot
-                                      .data!.releaseRequests!.cMobileNumber1!,
-                                  releaseID: snapshot
-                                      .data!.releaseRequests!.releaseId!,
-                                  userNameDriver: widget.dUserID,
-                                );
-                              });
-                          }
-                          else{
+                          if (widget.isUseOTP == true) {
+                            api.getOTP(
+                                snapshot.data!.releaseRequests!.cMobileNumber1!,
+                                widget.releaseID);
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return OTPAlertDialog(
+                                    driverID: widget.driverID,
+                                    dUserID: widget.dUserID,
+                                    mobileNumber: snapshot
+                                        .data!.releaseRequests!.cMobileNumber1!,
+                                    releaseID: snapshot
+                                        .data!.releaseRequests!.releaseId!,
+                                    userNameDriver: widget.dUserID,
+                                  );
+                                });
+                          } else {
                             showDialog(
                                 barrierDismissible: false,
                                 context: context,
@@ -982,11 +981,11 @@ class _NotDileveredAlertState extends State<NotDileveredAlert> {
   List<String> rejectName = [''];
 
   Future<void> fetchRejectReason() async {
-    var request = http.Request('GET', Uri.parse('http://www.rayatrade.com/RayaLogisticsAPI/api/shipmentStatus/All-Delivery-Rejection-Reason'));
-    var headers = {
-      'Username': 'Logistics',
-      'Password': 'H51Qob<zRRQ/f@%^'
-    };
+    var request = http.Request(
+        'GET',
+        Uri.parse(
+            'http://www.rayatrade.com/RayaLogisticsAPI/api/shipmentStatus/All-Delivery-Rejection-Reason'));
+    var headers = {'Username': 'Logistics', 'Password': 'H51Qob<zRRQ/f@%^'};
     request.headers.addAll(headers);
 
     var response = await request.send();
@@ -997,8 +996,8 @@ class _NotDileveredAlertState extends State<NotDileveredAlert> {
         print(jsonData);
       }
       setState(() {
-        rejectName =
-            List<String>.from(jsonData['reasons'].map((x) => x['reason'].toString()));
+        rejectName = List<String>.from(
+            jsonData['reasons'].map((x) => x['reason'].toString()));
         rejectID = List<String>.from(
             jsonData['reasons'].map((x) => x['id'].toString()));
         rejectValue = rejectName.first;

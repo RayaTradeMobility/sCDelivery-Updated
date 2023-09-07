@@ -13,7 +13,6 @@ import '../Models/ReleasesModel.dart';
 import '../Models/TasksModel.dart';
 
 class API {
-  // String URL = 'http://www.rayatrade.com/APIFormMobileDriver/api/Driver/';
   String url = 'http://www.rayatrade.com/RayaLogisticsAPI/api/Driver/';
 
   checkNetwork() async {
@@ -51,7 +50,7 @@ class API {
       String deviceVersion) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var headers = {
-        'Username': 'Logistics',
+      'Username': 'Logistics',
       'Password': 'H51Qob<zRRQ/f@%^',
       'Content-Type': 'application/json'
     };
@@ -248,7 +247,10 @@ class API {
       'Password': 'H51Qob<zRRQ/f@%^',
       'Content-Type': 'application/json'
     };
-    var request = http.Request('POST', Uri.parse('http://www.rayatrade.com/RayaLogisticsAPI/api/CallTracking/AddCallTracking'));
+    var request = http.Request(
+        'POST',
+        Uri.parse(
+            'http://www.rayatrade.com/RayaLogisticsAPI/api/CallTracking/AddCallTracking'));
     request.body = json.encode({
       "submitter": submitter,
       "releaseId": releaseId,
@@ -267,8 +269,7 @@ class API {
       if (kDebugMode) {
         print(await response.stream.bytesToString());
       }
-    }
-    else {
+    } else {
       if (kDebugMode) {
         print(response.reasonPhrase);
       }

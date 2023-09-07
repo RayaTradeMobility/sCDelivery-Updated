@@ -29,24 +29,23 @@ const LinearGradient customLinearGradient = LinearGradient(
 //////////////////////////////////////////////////////////////
 //Releases
 class ReleasesCard extends StatefulWidget {
-  const ReleasesCard({
-    super.key,
-    required this.dUserID,
-    required this.driverID,
-    required this.cAddress,
-    required this.cMobileNumber1,
-    required this.cName,
-    required this.dNameAR,
-    required this.oCreatedDate,
-    required this.orderID,
-    required this.releaseID,
-    required this.rShipmentID,
-    required this.driverUsername,
-    required this.releasenew,
-    required this.paymentstatus,
-    required this.oSystemStatusID,
-    required this.isUseOTP
-  });
+  const ReleasesCard(
+      {super.key,
+      required this.dUserID,
+      required this.driverID,
+      required this.cAddress,
+      required this.cMobileNumber1,
+      required this.cName,
+      required this.dNameAR,
+      required this.oCreatedDate,
+      required this.orderID,
+      required this.releaseID,
+      required this.rShipmentID,
+      required this.driverUsername,
+      required this.releasenew,
+      required this.paymentstatus,
+      required this.oSystemStatusID,
+      required this.isUseOTP});
 
   final int? paymentstatus, oSystemStatusID;
   final String dUserID,
@@ -676,11 +675,11 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
   List<String> rejectName = [''];
 
   Future<void> fetchRejectReason() async {
-    var request = http.Request('GET', Uri.parse('http://www.rayatrade.com/RayaLogisticsAPI/api/shipmentStatus/All-Delivery-Rejection-Reason'));
-    var headers = {
-      'Username': 'Logistics',
-      'Password': 'H51Qob<zRRQ/f@%^'
-    };
+    var request = http.Request(
+        'GET',
+        Uri.parse(
+            'http://www.rayatrade.com/RayaLogisticsAPI/api/shipmentStatus/All-Delivery-Rejection-Reason'));
+    var headers = {'Username': 'Logistics', 'Password': 'H51Qob<zRRQ/f@%^'};
     request.headers.addAll(headers);
 
     var response = await request.send();
@@ -691,8 +690,8 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
         print(jsonData);
       }
       setState(() {
-        rejectName =
-        List<String>.from(jsonData['reasons'].map((x) => x['reason'].toString()));
+        rejectName = List<String>.from(
+            jsonData['reasons'].map((x) => x['reason'].toString()));
         rejectID = List<String>.from(
             jsonData['reasons'].map((x) => x['id'].toString()));
         rejectValue = rejectName.first;

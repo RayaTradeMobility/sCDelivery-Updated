@@ -84,7 +84,7 @@ class _ReleaseBySearchScreenState extends State<ReleaseBySearchScreen> {
                                   dUserID: widget.dUserID,
                                   paymentstatus: r.paymentStatusID,
                                   oSystemStatusID: r.oSystemStatusID,
-                                  isUseOTP: r.isUseOTP!,
+                                  isUseOTP: r.isuseotp!,
                                 ),
                             ],
                           );

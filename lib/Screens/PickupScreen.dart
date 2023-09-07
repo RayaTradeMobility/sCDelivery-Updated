@@ -15,8 +15,7 @@ class PickupScreen extends StatefulWidget {
       required this.driverID,
       required this.aWB});
 
-  final String aWB;
-  final String driverUsername, dUserID;
+  final String aWB, driverUsername, dUserID;
   final int driverID;
 
   @override
