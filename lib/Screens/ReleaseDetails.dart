@@ -1017,6 +1017,7 @@ class _NotDileveredAlertState extends State<NotDileveredAlert> {
         content: Padding(
           padding: const EdgeInsets.all(2.0),
           child: Column(
+
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
