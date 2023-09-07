@@ -28,24 +28,24 @@ const LinearGradient customLinearGradient = LinearGradient(
 //////////////////////////////////////////////////////////////
 //Releases
 class ReleasesCard extends StatefulWidget {
-  const ReleasesCard(
-      {super.key,
-      required this.dUserID,
-      required this.driverID,
-      required this.cAddress,
-      required this.cMobileNumber1,
-      required this.cName,
-      required this.dNameAR,
-      required this.oCreatedDate,
-      required this.orderID,
-      required this.releaseID,
-      required this.rShipmentID,
-      required this.driverUsername,
-      required this.releasenew,
-      required this.paymentstatus,
-      required this.oSystemStatusID,
-        // required this.isUseOTP
-      });
+  const ReleasesCard({
+    super.key,
+    required this.dUserID,
+    required this.driverID,
+    required this.cAddress,
+    required this.cMobileNumber1,
+    required this.cName,
+    required this.dNameAR,
+    required this.oCreatedDate,
+    required this.orderID,
+    required this.releaseID,
+    required this.rShipmentID,
+    required this.driverUsername,
+    required this.releasenew,
+    required this.paymentstatus,
+    required this.oSystemStatusID,
+    // required this.isUseOTP
+  });
 
   final int? paymentstatus, oSystemStatusID;
   final String dUserID,
@@ -57,7 +57,8 @@ class ReleasesCard extends StatefulWidget {
       driverUsername,
       orderID;
   final int driverID, releaseID, rShipmentID;
-  final bool releasenew  ;
+  final bool releasenew;
+
   // final bool isUseOTP;
 
   @override
@@ -683,7 +684,7 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
 
       setState(() {
         rejectName =
-        List<String>.from(jsonData['reasons'].map((x) => x['reason']));
+            List<String>.from(jsonData['reasons'].map((x) => x['reason']));
         rejectID = List<String>.from(
             jsonData['reasons'].map((x) => x['id'].toString()));
         rejectValue = rejectName.first;
@@ -691,6 +692,7 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -718,7 +720,7 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
                     });
                   },
                   items: rejectName.map<DropdownMenuItem<String>>(
-                        (String value) {
+                    (String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: SizedBox(
