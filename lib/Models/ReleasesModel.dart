@@ -59,13 +59,13 @@ class ReleaseRequests {
   String? dNameAr;
   String? oCreatedDate;
   int? rShipmentId;
-  String? otpLogId;
+  int? otpLogId;
   String? rAttachedFile;
   String? rRejectionReason;
   String? oAwbUniqueNumber;
   bool? isCanceled;
   bool? isDelivered;
-  String? shipmentTypeId;
+  int? shipmentTypeId;
   String? oModifiedDate;
   int? paymentStatusId;
   int? oSystemStatusId;
