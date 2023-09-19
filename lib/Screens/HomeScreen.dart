@@ -218,9 +218,9 @@ class _HomeScreenState extends State<HomeScreen>
                                               isUseOTP: r.isuseotp!,
                                               driverID: widget.driverID,
                                               dUserID: widget.dUserID,
-                                              paymentstatus: r.paymentStatusID,
+                                              paymentstatus: r.paymentStatusId,
                                               oSystemStatusID:
-                                                  r.oSystemStatusID),
+                                                  r.oSystemStatusId),
                                       ],
                                     );
                                   } else if (snapshot.hasError) {
@@ -277,7 +277,6 @@ class _HomeScreenState extends State<HomeScreen>
                                               paymentstatus: 0,
                                               oSystemStatusID: 0,
                                               isUseOTP: r.isuseotp!,
-
                                             ),
                                         ],
                                       );

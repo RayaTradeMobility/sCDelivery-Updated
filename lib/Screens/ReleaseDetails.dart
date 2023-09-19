@@ -200,7 +200,7 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return DeliveredAlertDialog(
-                                    driverUsername: widget.driverUsername,
+                                    driverUsername: widget.dUserID,
                                     driverId: widget.driverID,
                                     userID: widget.dUserID,
                                     releaseID: widget.releaseID,
@@ -1248,7 +1248,7 @@ class _DeliveredAlertDialogState extends State<DeliveredAlertDialog> {
   String fileType = 'ALL';
   var fileTypeList = ['ALL'];
   FilePickerResult? result;
-  late String res;
+  String res = '';
   PlatformFile? file;
   ServicesUtility servicesUtility = ServicesUtility();
   bool _isloading = false;

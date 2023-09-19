@@ -59,19 +59,20 @@ class ReleaseRequests {
   String? dNameAr;
   String? oCreatedDate;
   int? rShipmentId;
-  int? otpLogId;
+  String? otpLogId;
   String? rAttachedFile;
   String? rRejectionReason;
   String? oAwbUniqueNumber;
-  bool? isuseotp;
   bool? isCanceled;
   bool? isDelivered;
-  int? shipmentTypeId;
+  String? shipmentTypeId;
   String? oModifiedDate;
-  int? paymentStatusID;
-  int? oSystemStatusID;
-  int? rOrderID;
+  int? paymentStatusId;
+  int? oSystemStatusId;
+  int? rOrderId;
   String? paymentMethod;
+  bool? isuseotp;
+  bool? isuseupload;
 
   ReleaseRequests(
       {this.releaseId,
@@ -86,15 +87,16 @@ class ReleaseRequests {
       this.rAttachedFile,
       this.rRejectionReason,
       this.oAwbUniqueNumber,
-      this.isuseotp,
       this.isCanceled,
       this.isDelivered,
       this.shipmentTypeId,
       this.oModifiedDate,
-      this.paymentStatusID,
-      this.oSystemStatusID,
-      this.rOrderID,
-      this.paymentMethod});
+      this.paymentStatusId,
+      this.oSystemStatusId,
+      this.rOrderId,
+      this.paymentMethod,
+      this.isuseotp,
+      this.isuseupload});
 
   ReleaseRequests.fromJson(Map<String, dynamic> json) {
     releaseId = json['releaseId'];
@@ -109,15 +111,16 @@ class ReleaseRequests {
     rAttachedFile = json['rAttachedFile'];
     rRejectionReason = json['rRejectionReason'];
     oAwbUniqueNumber = json['oAwbUniqueNumber'];
-    isuseotp = json['isuseotp'];
     isCanceled = json['isCanceled'];
     isDelivered = json['isDelivered'];
     shipmentTypeId = json['shipmentTypeId'];
     oModifiedDate = json['oModifiedDate'];
-    paymentStatusID = json['paymentStatusId'];
-    oSystemStatusID = json['oSystemStatusId'];
-    rOrderID = json['rOrderId'];
+    paymentStatusId = json['paymentStatusId'];
+    oSystemStatusId = json['oSystemStatusId'];
+    rOrderId = json['rOrderId'];
     paymentMethod = json['paymentMethod'];
+    isuseotp = json['isuseotp'];
+    isuseupload = json['isuseupload'];
   }
 
   Map<String, dynamic> toJson() {
@@ -134,15 +137,16 @@ class ReleaseRequests {
     data['rAttachedFile'] = rAttachedFile;
     data['rRejectionReason'] = rRejectionReason;
     data['oAwbUniqueNumber'] = oAwbUniqueNumber;
-    data['isuseotp'] = isuseotp;
     data['isCanceled'] = isCanceled;
     data['isDelivered'] = isDelivered;
     data['shipmentTypeId'] = shipmentTypeId;
     data['oModifiedDate'] = oModifiedDate;
-    data['paymentStatusId'] = paymentStatusID;
-    data['oSystemStatusId'] = oSystemStatusID;
-    data['rOrderId'] = rOrderID;
+    data['paymentStatusId'] = paymentStatusId;
+    data['oSystemStatusId'] = oSystemStatusId;
+    data['rOrderId'] = rOrderId;
     data['paymentMethod'] = paymentMethod;
+    data['isuseotp'] = isuseotp;
+    data['isuseupload'] = isuseupload;
     return data;
   }
 }
