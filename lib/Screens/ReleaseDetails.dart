@@ -2,7 +2,9 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'package:RayaExpressDriver/Services/File.dart';
+import 'package:RayaExpressDriver/Screens/transfer_order_screen.dart';
+
+import '../Services/File.dart';
 import 'package:collapsible/collapsible.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -161,6 +163,24 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                               barrierDismissible: false,
                               context: context,
                               builder: (BuildContext context) {
+                                return TransferOrderScreen(
+                                    awbNumber: snapshot.data!.releaseRequests!
+                                        .oAwbUniqueNumber!,
+                                    fromShipmentNumber: snapshot
+                                        .data!.releaseRequests!.sShipmentNo!);
+                              });
+                        },
+                        icon: const Icon(
+                          Icons.compare_arrows_sharp,
+                          color: Colors.black,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (BuildContext context) {
                                 return NotDileveredAlert(
                                   driverUsername: widget.driverUsername,
                                   driverId: widget.driverID,
@@ -212,7 +232,7 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                           Icons.done,
                           color: Colors.green,
                         ),
-                      )
+                      ),
                     ],
                   ),
               ],

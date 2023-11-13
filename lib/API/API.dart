@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:RayaExpressDriver/Models/response_message_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -11,6 +12,7 @@ import 'package:RayaExpressDriver/Models/UserModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Models/ReleasesModel.dart';
 import '../Models/TasksModel.dart';
+import '../Models/get_driver_model.dart';
 
 class API {
   String url = 'http://www.rayatrade.com/RayaLogisticsAPI/api/Driver/';
@@ -414,6 +416,56 @@ class API {
       return TasksModel.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to load Data");
+    }
+  }
+
+  Future<List<GetDriverModel>> getDriver() async {
+    var headers = {'Username': 'Logistics', 'Password': 'H51Qob<zRRQ/f@%^'};
+    var request = http.Request(
+        'GET',
+        Uri.parse(
+            'http://www.rayatrade.com/RayaLogisticsAPI/api/Driver/GetDrivers'));
+
+    request.headers.addAll(headers);
+
+    var streamedResponse = await request.send();
+    var response = await http.Response.fromStream(streamedResponse);
+    if (response.statusCode == 200) {
+      List<dynamic> jsonResponse = jsonDecode(response.body);
+      List<GetDriverModel> drivers = jsonResponse
+          .map((driver) => GetDriverModel.fromJson(driver))
+          .toList();
+      return drivers;
+    } else {
+      throw Exception("Failed to load Data");
+    }
+  }
+
+  Future<MessageResponse> transferOrder(String orderId, int fromShipmentNumber,
+      int toDriverId, int toShipmentNumber) async {
+    var headers = {
+      'Username': 'Logistics',
+      'Password': 'H51Qob<zRRQ/f@%^',
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request(
+        'PUT',
+        Uri.parse(
+            'http://www.rayatrade.com/RayaLogisticsAPI/api/Driver/TransferOrders'));
+    request.body = json.encode({
+      "orderID": orderId,
+      "fromShipmetNumber": fromShipmentNumber,
+      "toDriverID": toDriverId,
+      "toShipmentNumber": toShipmentNumber
+    });
+    request.headers.addAll(headers);
+
+    var streamedResponse = await request.send();
+    var response = await http.Response.fromStream(streamedResponse);
+    if (response.statusCode == 200) {
+      return MessageResponse.fromJson(jsonDecode(response.body));
+    } else {
+      return MessageResponse.fromJson(jsonDecode(response.body));
     }
   }
 }

@@ -12,10 +12,10 @@ class FileList extends StatefulWidget {
       : super(key: key);
 
   @override
-  _FileListState createState() => _FileListState();
+  FileListState createState() => FileListState();
 }
 
-class _FileListState extends State<FileList> {
+class FileListState extends State<FileList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
