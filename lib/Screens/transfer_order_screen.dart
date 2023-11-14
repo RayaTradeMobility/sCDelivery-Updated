@@ -1,17 +1,27 @@
+import 'package:RayaExpressDriver/Models/response_message_model.dart';
+import 'package:RayaExpressDriver/Screens/MenuScreen.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../API/API.dart';
 import '../Models/get_driver_model.dart';
 
 class TransferOrderScreen extends StatefulWidget {
   const TransferOrderScreen(
-      {super.key, required this.fromShipmentNumber, required this.awbNumber});
+      {super.key,
+      required this.fromShipmentNumber,
+      required this.awbNumber,
+      required this.driverUsername,
+      required this.dUserID,
+      required this.driverID});
 
   final String awbNumber;
   final int fromShipmentNumber;
+  final String driverUsername, dUserID;
+  final int driverID;
 
   @override
   State<TransferOrderScreen> createState() => _TransferOrderScreenState();
@@ -152,33 +162,76 @@ class _TransferOrderScreenState extends State<TransferOrderScreen> {
                 print("fromShipmentNumber:  ${widget.fromShipmentNumber}");
                 print("To Deliver id : $selectedDriverId");
               }
-              AwesomeDialog(
-                context: context,
-                dialogType: DialogType.info,
-                body: Column(
-                  children: [
-                    const Text("Enter Shipment Number"),
-                    TextField(
-                      controller: toShipmentNumberController,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                      ],
-                    ),
-                  ],
-                ),
-                btnOkColor: Colors.blue,
-                btnOkOnPress: () async {
-                  if (toShipmentNumberController.text.isNotEmpty) {
-                    await api.transferOrder(
-                      widget.awbNumber,
-                      widget.fromShipmentNumber,
-                      int.parse(selectedDriverId!),
-                      int.parse(toShipmentNumberController.text),
+              selectedDriverId != null
+                  ? AwesomeDialog(
+                      context: context,
+                      dialogType: DialogType.info,
+                      body: Column(
+                        children: [
+                          const Text("Enter Shipment Number"),
+                          TextField(
+                            controller: toShipmentNumberController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9]')),
+                            ],
+                          ),
+                        ],
+                      ),
+                      btnOkColor: Colors.blue,
+                      btnOkOnPress: () async {
+                        if (toShipmentNumberController.text.isEmpty) {
+                          Fluttertoast.showToast(
+                            msg: "Please Enter a Shipment Number",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                          );
+                        } else {
+                          MessageResponse res = await api.transferOrder(
+                            widget.awbNumber,
+                            widget.fromShipmentNumber,
+                            int.parse(selectedDriverId!),
+                            int.parse(toShipmentNumberController.text),
+                          );
+                          toShipmentNumberController.clear();
+                          if (res.message == "Success") {
+                            Fluttertoast.showToast(
+                              msg: res.message!,
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                            );
+                            toShipmentNumberController
+                                .clear(); // Clear the controller
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MenuScreen(
+                                  driverUsername: widget.driverUsername,
+                                  dUserID: widget.dUserID,
+                                  driverID: widget.driverID,
+                                ),
+                              ),
+                              (route) => false,
+                            );
+                          } else if (res.message != "Success" ||
+                              res.message == null) {
+                            Fluttertoast.showToast(
+                              msg: res.message!,
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                            );
+                            toShipmentNumberController
+                                .clear(); // Clear the controller
+                          }
+                        }
+                      },
+                    ).show()
+                  : Fluttertoast.showToast(
+                      msg: "Please Choose Driver",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
                     );
-                  }
-                },
-              ).show();
             },
             child: const Text("Confirm"),
           )

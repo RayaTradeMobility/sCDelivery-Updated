@@ -462,6 +462,9 @@ class API {
 
     var streamedResponse = await request.send();
     var response = await http.Response.fromStream(streamedResponse);
+    if (kDebugMode) {
+      print(response.body);
+    }
     if (response.statusCode == 200) {
       return MessageResponse.fromJson(jsonDecode(response.body));
     } else {

@@ -164,10 +164,14 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                               context: context,
                               builder: (BuildContext context) {
                                 return TransferOrderScreen(
-                                    awbNumber: snapshot.data!.releaseRequests!
-                                        .oAwbUniqueNumber!,
-                                    fromShipmentNumber: snapshot
-                                        .data!.releaseRequests!.sShipmentNo!);
+                                  awbNumber: snapshot
+                                      .data!.releaseRequests!.oAwbUniqueNumber!,
+                                  fromShipmentNumber: snapshot
+                                      .data!.releaseRequests!.sShipmentNo!,
+                                  driverUsername: widget.driverUsername,
+                                  dUserID: widget.dUserID,
+                                  driverID: widget.driverID,
+                                );
                               });
                         },
                         icon: const Icon(
@@ -228,9 +232,9 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                 });
                           }
                         },
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.done,
-                          color: Colors.green,
+                          color: Colors.green[700],
                         ),
                       ),
                     ],

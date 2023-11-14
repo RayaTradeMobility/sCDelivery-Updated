@@ -44,8 +44,6 @@ dependencies {
     // add this
 
 
-
-
     // Add the dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
 }
@@ -87,7 +85,7 @@ android {
 flutter {
     source '../..'
 }
-dependencies{
+dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.2.2"))
     implementation 'com.google.firebase:firebase-analytics'
 }
