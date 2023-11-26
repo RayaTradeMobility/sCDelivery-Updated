@@ -167,7 +167,7 @@ class _ReleaseDetailsState extends State<ReleaseDetails> {
                                   awbNumber: snapshot
                                       .data!.releaseRequests!.oAwbUniqueNumber!,
                                   fromShipmentNumber: snapshot
-                                      .data!.releaseRequests!.sShipmentNo!,
+                                      .data!.releaseRequests!.rShipmentId!,
                                   driverUsername: widget.driverUsername,
                                   dUserID: widget.dUserID,
                                   driverID: widget.driverID,

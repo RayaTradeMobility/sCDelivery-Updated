@@ -1,3 +1,4 @@
+import 'package:RayaExpressDriver/Models/response_message_model.dart';
 import 'package:RayaExpressDriver/Screens/MenuScreen.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -167,7 +168,7 @@ class _TransferOrderScreenState extends State<TransferOrderScreen> {
                       dialogType: DialogType.info,
                       body: Column(
                         children: [
-                          const Text("اكتب رقم الشحنه"),
+                          const Text("اكتب رقم الشحنه الجديده"),
                           TextField(
                             controller: toShipmentNumberController,
                             keyboardType: TextInputType.number,
@@ -187,14 +188,14 @@ class _TransferOrderScreenState extends State<TransferOrderScreen> {
                             gravity: ToastGravity.CENTER,
                           );
                         } else {
-                          String res = await api.transferOrder(
+                          MessageResponse res = await api.transferOrder(
                             widget.awbNumber,
                             widget.fromShipmentNumber,
                             int.parse(selectedDriverId!),
                             int.parse(toShipmentNumberController.text),
                           );
                           toShipmentNumberController.clear();
-                          if (res == "true") {
+                          if (res.code == "00") {
                             Fluttertoast.showToast(
                               msg: "تم تحويل الاوردر بنجاح",
                               toastLength: Toast.LENGTH_SHORT,
@@ -212,20 +213,21 @@ class _TransferOrderScreenState extends State<TransferOrderScreen> {
                               ),
                               (route) => false,
                             );
-                          } else if (res == "false") {
+                          } else if (res.message != "00") {
                             Fluttertoast.showToast(
-                              msg: "لم يتم تحويل الاوردر",
+                              msg: res.message!,
                               toastLength: Toast.LENGTH_SHORT,
                               gravity: ToastGravity.CENTER,
                             );
                             toShipmentNumberController.clear();
-                          } else if (res != "true" || res != "false") {
-                            Fluttertoast.showToast(
-                              msg: "يوجد خطا برجاء اعاده المحاوله",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.CENTER,
-                            );
                           }
+                          // else if (res != "true" || res != "false") {
+                          //   Fluttertoast.showToast(
+                          //     msg: "يوجد خطا برجاء اعاده المحاوله",
+                          //     toastLength: Toast.LENGTH_SHORT,
+                          //     gravity: ToastGravity.CENTER,
+                          //   );
+                          // }
                         }
                       },
                     ).show()

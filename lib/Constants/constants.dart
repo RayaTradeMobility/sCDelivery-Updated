@@ -14,8 +14,6 @@ import '../API/api.dart';
 import '../Models/PickupModel.dart';
 import '../Screens/PickupScreen.dart';
 import 'package:http/http.dart' as http;
-
-import '../Services/File.dart';
 import '../Services/service_utility.dart';
 
 const fontColor = Color(0xFF031639);
@@ -465,18 +463,17 @@ class _PickupCardState extends State<PickupCard> {
                                                               await servicesUtility
                                                                   .getLocation();
                                                           PickupModel acted =
-                                                              await api.putActionPick(
-                                                                  '',
-                                                                  widget
-                                                                      .scheduleID,
-                                                                  true,
-                                                                  file!.path!,
-                                                                  position
-                                                                      .latitude
-                                                                      .toString(),
-                                                                  position
-                                                                      .longitude
-                                                                      .toString());
+                                                              await api
+                                                                  .putActionPickNew(
+                                                            '',
+                                                            widget.scheduleID,
+                                                            true,
+                                                            file!.path!,
+                                                            position.latitude
+                                                                .toString(),
+                                                            position.longitude
+                                                                .toString(),
+                                                          );
                                                           if (acted.headerInfo
                                                                   ?.message ==
                                                               "Success") {
@@ -551,6 +548,9 @@ class _PickupCardState extends State<PickupCard> {
                                                 ElevatedButton(
                                                   onPressed: () {
                                                     viewFile(file!);
+                                                    if (kDebugMode) {
+                                                      print(file!.path!);
+                                                    }
                                                   },
                                                   child: const Text(
                                                       'اظهار الصورة المرفوعة'),
@@ -646,12 +646,6 @@ class _PickupCardState extends State<PickupCard> {
     setState(() {
       this.file = platformFile;
     });
-    loadSelectedFiles([platformFile]);
-  }
-
-  void loadSelectedFiles(List<PlatformFile> files) {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => FileList(files: files, onOpenedFile: viewFile)));
   }
 
   void viewFile(PlatformFile file) {
@@ -822,22 +816,24 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
                     },
                   ).toList(),
                 ),
-                if (file != null)
                   Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        if (file != null)
+
                         ElevatedButton(
                             onPressed: () async {
                               if (rejectValue != '') {
                                 Position pos =
                                     await servicesUtility.getLocation();
-                                PickupModel acted = await api.putActionPick(
-                                    rejectValue,
-                                    widget.scheduleID,
-                                    false,
-                                    file!.path!,
-                                    pos.latitude.toString(),
-                                    pos.longitude.toString());
+                                PickupModel acted = await api.putActionPickNew(
+                                  rejectValue,
+                                  widget.scheduleID,
+                                  false,
+                                  file!.path!,
+                                  pos.latitude.toString(),
+                                  pos.longitude.toString(),
+                                );
                                 if (acted.headerInfo?.message == "Success") {
                                   Fluttertoast.showToast(
                                       msg: 'Done',
@@ -894,6 +890,9 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
                   ElevatedButton(
                     onPressed: () {
                       viewFile(file!);
+                      if (kDebugMode) {
+                        print(file!.path!);
+                      }
                     },
                     child: const Text('اظهار الصورة المرفوعة'),
                   ),
@@ -926,12 +925,6 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
     setState(() {
       this.file = platformFile;
     });
-    loadSelectedFiles([platformFile]);
-  }
-
-  void loadSelectedFiles(List<PlatformFile> files) {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => FileList(files: files, onOpenedFile: viewFile)));
   }
 
   void viewFile(PlatformFile file) {

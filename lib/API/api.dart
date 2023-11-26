@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:RayaExpressDriver/Models/response_message_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -380,6 +381,41 @@ class API {
     }
   }
 
+  Future<PickupModel> putActionPickNew(String reason, int scheduleID,
+      bool accept, String imagePath, String latitude, String longitude) async {
+    var headers = {
+      'Username': 'Logistics',
+      'Password': 'H51Qob<zRRQ/f@%^',
+      'Content-Type': 'multipart/form-data'
+    };
+    var request =
+        http.MultipartRequest('POST', Uri.parse('$url/Pick-Action-With-Proof'));
+    request.fields.addAll({
+      "reason": reason,
+      "scheduleID": scheduleID.toString(),
+      "accept": accept.toString(),
+      "latitude": latitude,
+      "longitude": longitude,
+    });
+    request.files
+        .add(await http.MultipartFile.fromPath('Pickuppath', imagePath));
+    if (kDebugMode) {
+      print(request.fields);
+      print(request.files);
+    }
+    request.headers.addAll(headers);
+    var streamedResponse = await request.send();
+    var response = await http.Response.fromStream(streamedResponse);
+    if (response.statusCode == 200) {
+      if (kDebugMode) {
+        print(response.body);
+      }
+      return PickupModel.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception("Failed to load Data");
+    }
+  }
+
   Future<TasksModel> getTasksList(int driverID) async {
     var headers = {'Username': 'Logistics', 'Password': 'H51Qob<zRRQ/f@%^'};
     var request = http.Request('GET',
@@ -400,7 +436,7 @@ class API {
 
   Future<List<GetDriverModel>> getDriver() async {
     var headers = {'Username': 'Logistics', 'Password': 'H51Qob<zRRQ/f@%^'};
-    var request = http.Request('GET', Uri.parse('$url GetDrivers'));
+    var request = http.Request('GET', Uri.parse('$url/GetDrivers'));
 
     request.headers.addAll(headers);
 
@@ -428,6 +464,7 @@ class API {
     };
     var request = http.Request('PUT', Uri.parse('$url/TransferOrders'));
     request.body = json.encode({
+      // "awb"::awb,
       "orderID": orderNumber,
       "fromShipmetNumber": fromShipmentNumber,
       "toDriverID": toDriverId,
@@ -440,9 +477,8 @@ class API {
     if (kDebugMode) {
       print(response.body);
     }
-    String res = response.body.toString();
     if (response.statusCode == 200) {
-      return res;
+      return MessageResponse.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to fetch data');
     }
