@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 
-import '../API/API.dart';
-import '../Constants/Constants.dart';
+import '../API/api.dart';
+import '../Constants/constants.dart';
 import '../Models/ReleasesModel.dart';
 
 class ReleaseBySearchScreen extends StatefulWidget {

@@ -3,7 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'Services/Notification.dart';
-import 'API/API.dart';
+import 'API/api.dart';
 import 'package:RayaExpressDriver/Screens/splashScreen.dart';
 
 Future<void> backgroundHandler(RemoteMessage message) async {
@@ -38,13 +38,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     api.checkNetwork();
     LocalNotificationService.initialize(context);
 
-    ///gives you the message on which user taps
-    ///and it opened the app from terminated state
     FirebaseMessaging.instance.getInitialMessage().then((message) {
       if (message != null) {
         final routeFromMessage = message.data["route"];
@@ -53,7 +50,6 @@ class _MyAppState extends State<MyApp> {
       }
     });
 
-    ///foreground work
     FirebaseMessaging.onMessage.listen((message) {
       if (message.notification != null) {
         if (kDebugMode) {
@@ -65,8 +61,6 @@ class _MyAppState extends State<MyApp> {
       LocalNotificationService.display(message);
     });
 
-    ///When the app is in background but opened and user taps
-    ///on the notification
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
       final routeFromMessage = message.data["route"];
 

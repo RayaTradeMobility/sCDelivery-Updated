@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'dart:io' show Platform;
 
 import 'package:device_info_plus/device_info_plus.dart';
@@ -11,12 +9,11 @@ class ServicesUtility {
   getId() async {
     var deviceInfo = DeviceInfoPlugin();
     if (Platform.isIOS) {
-      // import 'dart:io'
       var iosDeviceInfo = await deviceInfo.iosInfo;
-      return iosDeviceInfo.identifierForVendor; // unique ID on iOS
+      return iosDeviceInfo.identifierForVendor;
     } else {
       var androidDeviceInfo = await deviceInfo.androidInfo;
-      return androidDeviceInfo.id; // unique ID on Android
+      return androidDeviceInfo.id;
     }
   }
 
@@ -62,6 +59,6 @@ class ServicesUtility {
     }
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-    return position; //Output: 29.6593457
+    return position;
   }
 }

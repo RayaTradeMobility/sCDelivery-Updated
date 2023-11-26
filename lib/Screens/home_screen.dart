@@ -1,10 +1,8 @@
-// ignore_for_file: file_names
-
 import 'package:RayaExpressDriver/Screens/MenuScreen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../API/API.dart';
-import '../Constants/Constants.dart';
+import '../API/api.dart';
+import '../Constants/constants.dart';
 import '../Models/ReleasesModel.dart';
 import 'QRCodeScreen.dart';
 import 'ReleaseBySearchScreen.dart';
@@ -136,7 +134,6 @@ class _HomeScreenState extends State<HomeScreen>
           height: MediaQuery.of(context).size.height,
           decoration: const BoxDecoration(
             gradient: customLinearGradient,
-            // color: Color(0xFFf7f7f7)
           ),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -153,7 +150,6 @@ class _HomeScreenState extends State<HomeScreen>
                   child: TabBar(
                     isScrollable: false,
                     controller: _tabController,
-                    // give the indicator a decoration (color and border radius)
                     indicator: BoxDecoration(
                       borderRadius: BorderRadius.circular(
                         25.0,
@@ -162,14 +158,10 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                     labelColor: Colors.white,
                     unselectedLabelColor: Colors.black,
-
                     tabs: const [
-                      // first tab [you can add a n icon using the icon property]
                       Tab(
                         text: 'الطلبات الجديدة',
                       ),
-
-                      // second tab [you can add an icon using the icon property]
                       Tab(
                         text: 'الطلبات المكتملة',
                       ),
@@ -180,7 +172,6 @@ class _HomeScreenState extends State<HomeScreen>
                   child: TabBarView(
                     controller: _tabController,
                     children: [
-                      // first tab bar view widget
                       RefreshIndicator(
                         key: _refreshIndicatorKey2,
                         onRefresh: () async {
@@ -235,7 +226,6 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         )),
                       ),
-                      // second tab bar view widget
                       RefreshIndicator(
                         key: _refreshIndicatorKey,
                         onRefresh: () async {
@@ -307,7 +297,6 @@ class _HomeScreenState extends State<HomeScreen>
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) {
-                // return PickupScreen(driverUsername: widget.driverUsername,dUserID: widget.dUserID,driverID: widget.driverID);
                 return QRViewExample(
                   driverID: widget.driverID,
                   dUserID: widget.dUserID,

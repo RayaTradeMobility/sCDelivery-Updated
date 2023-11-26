@@ -1,33 +1,31 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe, file_names
-
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:RayaExpressDriver/Screens/ReleaseDetails.dart';
-import 'package:RayaExpressDriver/Services/ServicesUtililty.dart';
-import '../API/API.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:open_file/open_file.dart';
+import 'package:permission_handler/permission_handler.dart';
+import '../API/api.dart';
 import '../Models/PickupModel.dart';
 import '../Screens/PickupScreen.dart';
 import 'package:http/http.dart' as http;
+
+import '../Services/File.dart';
+import '../Services/service_utility.dart';
 
 const fontColor = Color(0xFF031639);
 
 const LinearGradient customLinearGradient = LinearGradient(
   begin: Alignment.topRight,
   end: Alignment.bottomLeft,
-  colors: [
-    Colors.white10,
-    // Colors.lightBlueAccent,
-    Colors.black12,
-    Colors.white10
-  ],
+  colors: [Colors.white10, Colors.black12, Colors.white10],
 );
 
-//////////////////////////////////////////////////////////////
-//Releases
 class ReleasesCard extends StatefulWidget {
   const ReleasesCard(
       {super.key,
@@ -174,13 +172,13 @@ class _ReleasesCardState extends State<ReleasesCard> {
                         ],
                       ),
                       SizedBox.fromSize(
-                        size: const Size(90, 30), // button width and height
+                        size: const Size(90, 30),
                         child: ClipOval(
                           child: Material(
-                            color: const Color(0xFF3f8dfd), // button color
+                            color: const Color(0xFF3f8dfd),
                             child: InkWell(
-                              splashColor: Colors.grey, // splash color
-                              onTap: () {}, // button pressed
+                              splashColor: Colors.grey,
+                              onTap: () {},
                               child: const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -188,11 +186,11 @@ class _ReleasesCardState extends State<ReleasesCard> {
                                   Icon(
                                     Icons.location_on,
                                     color: Colors.white,
-                                  ), // icon
+                                  ),
                                   Text(
                                     " الخريطة",
                                     style: TextStyle(color: Colors.white),
-                                  ), // text
+                                  ),
                                 ],
                               ),
                             ),
@@ -270,8 +268,6 @@ class _ReleasesCardState extends State<ReleasesCard> {
   }
 }
 
-//////////////////////////////////////////////////
-//PICKUP
 class PickupCard extends StatefulWidget {
   const PickupCard(
       {super.key,
@@ -302,6 +298,9 @@ class PickupCard extends StatefulWidget {
 class _PickupCardState extends State<PickupCard> {
   API api = API();
   ServicesUtility servicesUtility = ServicesUtility();
+  PlatformFile? file;
+  String fileType = 'ALL';
+  var fileTypeList = ['ALL'];
 
   @override
   Widget build(BuildContext context) {
@@ -386,32 +385,6 @@ class _PickupCardState extends State<PickupCard> {
                           ),
                         ],
                       ),
-                      // SizedBox.fromSize(
-                      //   size: Size(90, 30), // button width and height
-                      //   child: ClipOval(
-                      //     child: Material(
-                      //       color: Color(0xFF3f8dfd), // button color
-                      //       child: InkWell(
-                      //         splashColor: Colors.grey, // splash color
-                      //         onTap: () {}, // button pressed
-                      //         child: Row(
-                      //           mainAxisAlignment: MainAxisAlignment.center,
-                      //           crossAxisAlignment: CrossAxisAlignment.center,
-                      //           children: const <Widget>[
-                      //             Icon(
-                      //               CupertinoIcons.list_bullet,
-                      //               color: Colors.white,
-                      //             ), // icon
-                      //             Text(
-                      //               " التفاصيل",
-                      //               style: TextStyle(color: Colors.white),
-                      //             ), // text
-                      //           ],
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // )
                     ],
                   ),
                   Row(
@@ -420,19 +393,6 @@ class _PickupCardState extends State<PickupCard> {
                     children: [
                       Row(
                         children: [
-                          // Icon(
-                          //   Icons.location_on,
-                          //   color: Colors.grey,
-                          // ),
-                          //
-                          // Text(
-                          //   widget.ShipperAddress,
-                          //   style: TextStyle(
-                          //       color: Colors.black, fontWeight: FontWeight.bold),
-                          // ),
-                          // SizedBox(
-                          //   width: 10.0,
-                          // ),
                           const Icon(
                             Icons.phone,
                             color: Colors.grey,
@@ -483,47 +443,124 @@ class _PickupCardState extends State<PickupCard> {
                         children: [
                           ElevatedButton(
                             onPressed: () async {
-                              Position position =
-                                  await servicesUtility.getLocation();
-                              PickupModel acted = await api.putActionPick(
-                                  '',
-                                  widget.scheduleID,
-                                  true,
-                                  position.latitude.toString(),
-                                  position.longitude.toString());
-                              if (acted.headerInfo?.message == "Success") {
-                                Fluttertoast.showToast(
-                                    msg: 'Done',
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.CENTER,
-                                    timeInSecForIosWeb: 1,
-                                    backgroundColor: Colors.red,
-                                    textColor: Colors.white,
-                                    fontSize: 16.0);
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text("برجاء رفع الصوره"),
+                                      content: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: SingleChildScrollView(
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  if (file != null)
+                                                    ElevatedButton(
+                                                        onPressed: () async {
+                                                          Position position =
+                                                              await servicesUtility
+                                                                  .getLocation();
+                                                          PickupModel acted =
+                                                              await api.putActionPick(
+                                                                  '',
+                                                                  widget
+                                                                      .scheduleID,
+                                                                  true,
+                                                                  file!.path!,
+                                                                  position
+                                                                      .latitude
+                                                                      .toString(),
+                                                                  position
+                                                                      .longitude
+                                                                      .toString());
+                                                          if (acted.headerInfo
+                                                                  ?.message ==
+                                                              "Success") {
+                                                            Fluttertoast.showToast(
+                                                                msg: 'Done',
+                                                                toastLength: Toast
+                                                                    .LENGTH_SHORT,
+                                                                gravity:
+                                                                    ToastGravity
+                                                                        .CENTER,
+                                                                timeInSecForIosWeb:
+                                                                    1,
+                                                                backgroundColor:
+                                                                    Colors.red,
+                                                                textColor:
+                                                                    Colors
+                                                                        .white,
+                                                                fontSize: 16.0);
 
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) {
-                                    return PickupScreen(
-                                      driverUsername: widget.driverUsername,
-                                      dUserID: widget.dUserID,
-                                      driverID: widget.driverID,
-                                      aWB: '',
+                                                            Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) {
+                                                                return PickupScreen(
+                                                                  driverUsername:
+                                                                      widget
+                                                                          .driverUsername,
+                                                                  dUserID: widget
+                                                                      .dUserID,
+                                                                  driverID: widget
+                                                                      .driverID,
+                                                                  aWB: '',
+                                                                );
+                                                              }),
+                                                            );
+                                                          } else {
+                                                            Fluttertoast.showToast(
+                                                                msg: acted
+                                                                        .headerInfo
+                                                                        ?.message
+                                                                        .toString() ??
+                                                                    'Error',
+                                                                toastLength: Toast
+                                                                    .LENGTH_SHORT,
+                                                                gravity:
+                                                                    ToastGravity
+                                                                        .CENTER,
+                                                                timeInSecForIosWeb:
+                                                                    1,
+                                                                backgroundColor:
+                                                                    Colors.red,
+                                                                textColor:
+                                                                    Colors
+                                                                        .white,
+                                                                fontSize: 16.0);
+                                                          }
+                                                        },
+                                                        child: const Text(
+                                                            "ارسال")),
+                                                  ElevatedButton(
+                                                    onPressed: () async {
+                                                      pickFiles(fileType);
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: const Text(
+                                                        'ارفع الصوره '),
+                                                  ),
+                                                ],
+                                              ),
+                                              if (file != null)
+                                                ElevatedButton(
+                                                  onPressed: () {
+                                                    viewFile(file!);
+                                                  },
+                                                  child: const Text(
+                                                      'اظهار الصورة المرفوعة'),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
                                     );
-                                    // return QRViewExample();
-                                  }),
-                                );
-                              } else {
-                                Fluttertoast.showToast(
-                                    msg: acted.headerInfo?.message.toString() ??
-                                        'Error',
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.CENTER,
-                                    timeInSecForIosWeb: 1,
-                                    backgroundColor: Colors.red,
-                                    textColor: Colors.white,
-                                    fontSize: 16.0);
-                              }
+                                  });
                             },
                             child: const Center(
                                 child: Text(
@@ -582,6 +619,43 @@ class _PickupCardState extends State<PickupCard> {
         ),
       ),
     );
+  }
+
+  void pickFiles(String filetype) async {
+    var status = await Permission.camera.status;
+    if (status.isDenied) {
+      Map<Permission, PermissionStatus> statuses = await [
+        Permission.camera,
+      ].request();
+      if (kDebugMode) {
+        print(statuses[Permission.camera]);
+      }
+    }
+
+    final result = await ImagePicker()
+        .pickImage(source: ImageSource.camera, imageQuality: 25);
+    if (result == null) return;
+    final file = File(result.path);
+    final fileSize = await file.length();
+    final platformFile = PlatformFile(
+      name: result.name,
+      size: fileSize,
+      path: result.path,
+      bytes: await result.readAsBytes(),
+    );
+    setState(() {
+      this.file = platformFile;
+    });
+    loadSelectedFiles([platformFile]);
+  }
+
+  void loadSelectedFiles(List<PlatformFile> files) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => FileList(files: files, onOpenedFile: viewFile)));
+  }
+
+  void viewFile(PlatformFile file) {
+    OpenFile.open(file.path);
   }
 }
 
@@ -673,6 +747,9 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
   String rejectValue = "";
   List<String> rejectID = [''];
   List<String> rejectName = [''];
+  PlatformFile? file;
+  String fileType = 'ALL';
+  var fileTypeList = ['ALL'];
 
   Future<void> fetchRejectReason() async {
     var request = http.Request(
@@ -733,7 +810,7 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
                     });
                   },
                   items: rejectName.map<DropdownMenuItem<String>>(
-                        (String value) {
+                    (String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: SizedBox(
@@ -745,63 +822,119 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
                     },
                   ).toList(),
                 ),
+                if (file != null)
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        ElevatedButton(
+                            onPressed: () async {
+                              if (rejectValue != '') {
+                                Position pos =
+                                    await servicesUtility.getLocation();
+                                PickupModel acted = await api.putActionPick(
+                                    rejectValue,
+                                    widget.scheduleID,
+                                    false,
+                                    file!.path!,
+                                    pos.latitude.toString(),
+                                    pos.longitude.toString());
+                                if (acted.headerInfo?.message == "Success") {
+                                  Fluttertoast.showToast(
+                                      msg: 'Done',
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.red,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0);
 
-                ElevatedButton(
-                    onPressed: () async {
-                      if (rejectValue != '') {
-                        Position pos = await servicesUtility.getLocation();
-                        PickupModel acted = await api.putActionPick(
-                            rejectValue,
-                            widget.scheduleID,
-                            false,
-                            pos.latitude.toString(),
-                            pos.longitude.toString());
-                        if (acted.headerInfo?.message == "Success") {
-                          Fluttertoast.showToast(
-                              msg: 'Done',
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.CENTER,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.red,
-                              textColor: Colors.white,
-                              fontSize: 16.0);
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) {
-                              return PickupScreen(
-                                driverUsername: widget.driverUsername,
-                                dUserID: widget.dUserID.toString(),
-                                driverID: widget.driverID,
-                                aWB: '',
-                              );
-                              // return QRViewExample();
-                            }),
-                          );
-                        } else {
-                          Fluttertoast.showToast(
-                              msg: acted.headerInfo?.message.toString() ??
-                                  'Error',
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.CENTER,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.red,
-                              textColor: Colors.white,
-                              fontSize: 16.0);
-                        }
-                      } else {
-                        Fluttertoast.showToast(
-                            msg: "اختر سبب الرفض",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.red,
-                            textColor: Colors.white,
-                            fontSize: 16.0);
-                      }
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) {
+                                      return PickupScreen(
+                                        driverUsername: widget.driverUsername,
+                                        dUserID: widget.dUserID.toString(),
+                                        driverID: widget.driverID,
+                                        aWB: '',
+                                      );
+                                    }),
+                                  );
+                                } else {
+                                  Fluttertoast.showToast(
+                                      msg: acted.headerInfo?.message
+                                              .toString() ??
+                                          'Error',
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.red,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0);
+                                }
+                              } else {
+                                Fluttertoast.showToast(
+                                    msg: "اختر سبب الرفض",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.red,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0);
+                              }
+                            },
+                            child: const Text('تم')),
+                        ElevatedButton(
+                          onPressed: () async {
+                            pickFiles(fileType);
+                          },
+                          child: const Text('ارفع الصوره '),
+                        ),
+                      ]),
+                if (file != null)
+                  ElevatedButton(
+                    onPressed: () {
+                      viewFile(file!);
                     },
-                    child: const Text('تم'))
+                    child: const Text('اظهار الصورة المرفوعة'),
+                  ),
               ]),
         ));
+  }
+
+  void pickFiles(String filetype) async {
+    var status = await Permission.camera.status;
+    if (status.isDenied) {
+      Map<Permission, PermissionStatus> statuses = await [
+        Permission.camera,
+      ].request();
+      if (kDebugMode) {
+        print(statuses[Permission.camera]);
+      }
+    }
+
+    final result = await ImagePicker()
+        .pickImage(source: ImageSource.camera, imageQuality: 25);
+    if (result == null) return;
+    final file = File(result.path);
+    final fileSize = await file.length();
+    final platformFile = PlatformFile(
+      name: result.name,
+      size: fileSize,
+      path: result.path,
+      bytes: await result.readAsBytes(),
+    );
+    setState(() {
+      this.file = platformFile;
+    });
+    loadSelectedFiles([platformFile]);
+  }
+
+  void loadSelectedFiles(List<PlatformFile> files) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => FileList(files: files, onOpenedFile: viewFile)));
+  }
+
+  void viewFile(PlatformFile file) {
+    OpenFile.open(file.path);
   }
 }

@@ -1,8 +1,5 @@
-// ignore_for_file: file_names
-
 import 'dart:convert';
 import 'dart:io';
-import 'package:RayaExpressDriver/Models/response_message_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -21,27 +18,8 @@ class API {
     try {
       final result = await InternetAddress.lookup(
           'http://www.rayatrade.com/RayaLogisticsAPI/Swagger/Index.html');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        // Fluttertoast.showToast(
-        //     msg: "Loading",
-        //     toastLength: Toast.LENGTH_SHORT,
-        //     gravity: ToastGravity.BOTTOM,
-        //     timeInSecForIosWeb: 1,
-        //     backgroundColor: Colors.red,
-        //     textColor: Colors.white,
-        //     fontSize: 16.0
-        // );
-      }
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {}
     } on SocketException catch (_) {
-      // Fluttertoast.showToast(
-      //     msg: "No Internet",
-      //     toastLength: Toast.LENGTH_SHORT,
-      //     gravity: ToastGravity.BOTTOM,
-      //     timeInSecForIosWeb: 1,
-      //     backgroundColor: Colors.red,
-      //     textColor: Colors.white,
-      //     fontSize: 16.0
-      // );
       return const AboutDialog(
         children: [Text('No Internet')],
       );
@@ -371,7 +349,7 @@ class API {
   }
 
   Future<PickupModel> putActionPick(String reason, int scheduleID, bool accept,
-      String latitude, String longitude) async {
+      String imagePath, String latitude, String longitude) async {
     var headers = {
       'Username': 'Logistics',
       'Password': 'H51Qob<zRRQ/f@%^',
@@ -381,6 +359,7 @@ class API {
     request.body = json.encode({
       "reason": reason,
       "scheduleID": scheduleID,
+      "Image": imagePath,
       "accept": accept,
       "latitude": latitude,
       "longitude": longitude
@@ -421,10 +400,7 @@ class API {
 
   Future<List<GetDriverModel>> getDriver() async {
     var headers = {'Username': 'Logistics', 'Password': 'H51Qob<zRRQ/f@%^'};
-    var request = http.Request(
-        'GET',
-        Uri.parse(
-            'http://www.rayatrade.com/RayaLogisticsAPI/api/Driver/GetDrivers'));
+    var request = http.Request('GET', Uri.parse('$url GetDrivers'));
 
     request.headers.addAll(headers);
 
@@ -441,19 +417,18 @@ class API {
     }
   }
 
-  Future<MessageResponse> transferOrder(String orderId, int fromShipmentNumber,
-      int toDriverId, int toShipmentNumber) async {
+  transferOrder(String orderId, int fromShipmentNumber, int toDriverId,
+      int toShipmentNumber) async {
+    int orderNumber = int.parse(orderId.substring(5));
+
     var headers = {
       'Username': 'Logistics',
       'Password': 'H51Qob<zRRQ/f@%^',
       'Content-Type': 'application/json'
     };
-    var request = http.Request(
-        'PUT',
-        Uri.parse(
-            'http://www.rayatrade.com/RayaLogisticsAPI/api/Driver/TransferOrders'));
+    var request = http.Request('PUT', Uri.parse('$url/TransferOrders'));
     request.body = json.encode({
-      "orderID": orderId,
+      "orderID": orderNumber,
       "fromShipmetNumber": fromShipmentNumber,
       "toDriverID": toDriverId,
       "toShipmentNumber": toShipmentNumber
@@ -465,10 +440,11 @@ class API {
     if (kDebugMode) {
       print(response.body);
     }
+    String res = response.body.toString();
     if (response.statusCode == 200) {
-      return MessageResponse.fromJson(jsonDecode(response.body));
+      return res;
     } else {
-      return MessageResponse.fromJson(jsonDecode(response.body));
+      throw Exception('Failed to fetch data');
     }
   }
 }

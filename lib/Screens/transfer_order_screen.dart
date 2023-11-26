@@ -1,4 +1,3 @@
-import 'package:RayaExpressDriver/Models/response_message_model.dart';
 import 'package:RayaExpressDriver/Screens/MenuScreen.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -6,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import '../API/API.dart';
+import '../API/api.dart';
 import '../Models/get_driver_model.dart';
 
 class TransferOrderScreen extends StatefulWidget {
@@ -76,7 +75,7 @@ class _TransferOrderScreenState extends State<TransferOrderScreen> {
             child: DropdownButton2<String>(
               isExpanded: true,
               hint: Text(
-                'Select Driver',
+                'اختر السائق',
                 style: TextStyle(
                   fontSize: 14,
                   color: Theme.of(context).hintColor,
@@ -132,7 +131,7 @@ class _TransferOrderScreenState extends State<TransferOrderScreen> {
                         horizontal: 10,
                         vertical: 8,
                       ),
-                      hintText: 'Search for Driver...',
+                      hintText: 'ابحث عن السائق',
                       hintStyle: const TextStyle(fontSize: 12),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -158,7 +157,7 @@ class _TransferOrderScreenState extends State<TransferOrderScreen> {
           ElevatedButton(
             onPressed: () async {
               if (kDebugMode) {
-                print("order Id : ${widget.awbNumber}");
+                print("order Id : ${widget.awbNumber.substring(5)}");
                 print("fromShipmentNumber:  ${widget.fromShipmentNumber}");
                 print("To Deliver id : $selectedDriverId");
               }
@@ -168,7 +167,7 @@ class _TransferOrderScreenState extends State<TransferOrderScreen> {
                       dialogType: DialogType.info,
                       body: Column(
                         children: [
-                          const Text("Enter Shipment Number"),
+                          const Text("اكتب رقم الشحنه"),
                           TextField(
                             controller: toShipmentNumberController,
                             keyboardType: TextInputType.number,
@@ -183,26 +182,25 @@ class _TransferOrderScreenState extends State<TransferOrderScreen> {
                       btnOkOnPress: () async {
                         if (toShipmentNumberController.text.isEmpty) {
                           Fluttertoast.showToast(
-                            msg: "Please Enter a Shipment Number",
+                            msg: "من فضلك اختر رقم الشحنه",
                             toastLength: Toast.LENGTH_SHORT,
                             gravity: ToastGravity.CENTER,
                           );
                         } else {
-                          MessageResponse res = await api.transferOrder(
+                          String res = await api.transferOrder(
                             widget.awbNumber,
                             widget.fromShipmentNumber,
                             int.parse(selectedDriverId!),
                             int.parse(toShipmentNumberController.text),
                           );
                           toShipmentNumberController.clear();
-                          if (res.message == "Success") {
+                          if (res == "true") {
                             Fluttertoast.showToast(
-                              msg: res.message!,
+                              msg: "تم تحويل الاوردر بنجاح",
                               toastLength: Toast.LENGTH_SHORT,
                               gravity: ToastGravity.CENTER,
                             );
-                            toShipmentNumberController
-                                .clear(); // Clear the controller
+                            toShipmentNumberController.clear();
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
@@ -214,15 +212,19 @@ class _TransferOrderScreenState extends State<TransferOrderScreen> {
                               ),
                               (route) => false,
                             );
-                          } else if (res.message != "Success" ||
-                              res.message == null) {
+                          } else if (res == "false") {
                             Fluttertoast.showToast(
-                              msg: res.message!,
+                              msg: "لم يتم تحويل الاوردر",
                               toastLength: Toast.LENGTH_SHORT,
                               gravity: ToastGravity.CENTER,
                             );
-                            toShipmentNumberController
-                                .clear(); // Clear the controller
+                            toShipmentNumberController.clear();
+                          } else if (res != "true" || res != "false") {
+                            Fluttertoast.showToast(
+                              msg: "يوجد خطا برجاء اعاده المحاوله",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                            );
                           }
                         }
                       },

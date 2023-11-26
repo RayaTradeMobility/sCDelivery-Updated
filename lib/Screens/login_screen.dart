@@ -1,18 +1,16 @@
-// ignore_for_file: file_names
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:RayaExpressDriver/API/API.dart';
+import 'package:RayaExpressDriver/API/api.dart';
 import 'package:RayaExpressDriver/Models/UserModel.dart';
 import 'package:RayaExpressDriver/Screens/MenuScreen.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:RayaExpressDriver/Services/ServicesUtililty.dart';
+import 'package:RayaExpressDriver/Services/service_utility.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../Constants/Constants.dart';
+import '../Constants/constants.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -135,7 +133,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                     filled: true,
-                    //<-- SEE HERE
                     fillColor: Colors.white,
                     hintText: "اسم المستخدم",
                     prefixIcon: const Icon(Icons.email),
@@ -160,18 +157,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 obscureText: _passwordVisibility,
                 decoration: InputDecoration(
                   filled: true,
-                  //<-- SEE HERE
                   fillColor: Colors.white,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      // Based on passwordVisible state choose the icon
                       _passwordVisibility
                           ? Icons.visibility
                           : Icons.visibility_off,
                       color: Theme.of(context).primaryColorDark,
                     ),
                     onPressed: () {
-                      // Update the state i.e. toogle the state of passwordVisible variable
                       setState(() {
                         _passwordVisibility = !_passwordVisibility;
                       });
@@ -213,7 +207,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         final tokenFcm =
                             await FirebaseMessaging.instance.getToken();
                         String deviceid = await deviceID.getId();
-                        // String deviceid = 'RSR1.201013.001';
                         UserModel user = await api.login(
                           username.text,
                           password.text,
@@ -239,8 +232,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           });
                           Fluttertoast.showToast(
                             msg: user.headerInfo!.message ?? 'Error Connection',
-                            // Toast properties
-                            // ...
                           );
                         }
                       } on Exception {
@@ -249,8 +240,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         });
                         Fluttertoast.showToast(
                           msg: 'Error Connection',
-                          // Toast properties
-                          // ...
                         );
                       }
                     } else {
@@ -264,8 +253,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     });
                     Fluttertoast.showToast(
                       msg: 'Permission not granted',
-                      // Toast properties
-                      // ...
                     );
                   }
                 },
