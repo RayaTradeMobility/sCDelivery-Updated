@@ -816,86 +816,73 @@ class _PickupRejectionReasonState extends State<PickupRejectionReason> {
                     },
                   ).toList(),
                 ),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        if (file != null)
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                          onPressed: () async {
+                            if (rejectValue != '') {
+                              Position pos =
+                                  await servicesUtility.getLocation();
+                              PickupModel acted = await api.putActionPickNew(
+                                rejectValue,
+                                widget.scheduleID,
+                                false,
+                                "",
+                                pos.latitude.toString(),
+                                pos.longitude.toString(),
+                              );
+                              if (acted.headerInfo?.message == "Success") {
+                                Fluttertoast.showToast(
+                                    msg: 'Done',
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.red,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0);
 
-                        ElevatedButton(
-                            onPressed: () async {
-                              if (rejectValue != '') {
-                                Position pos =
-                                    await servicesUtility.getLocation();
-                                PickupModel acted = await api.putActionPickNew(
-                                  rejectValue,
-                                  widget.scheduleID,
-                                  false,
-                                  file!.path!,
-                                  pos.latitude.toString(),
-                                  pos.longitude.toString(),
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) {
+                                    return PickupScreen(
+                                      driverUsername: widget.driverUsername,
+                                      dUserID: widget.dUserID.toString(),
+                                      driverID: widget.driverID,
+                                      aWB: '',
+                                    );
+                                  }),
                                 );
-                                if (acted.headerInfo?.message == "Success") {
-                                  Fluttertoast.showToast(
-                                      msg: 'Done',
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      gravity: ToastGravity.CENTER,
-                                      timeInSecForIosWeb: 1,
-                                      backgroundColor: Colors.red,
-                                      textColor: Colors.white,
-                                      fontSize: 16.0);
-
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) {
-                                      return PickupScreen(
-                                        driverUsername: widget.driverUsername,
-                                        dUserID: widget.dUserID.toString(),
-                                        driverID: widget.driverID,
-                                        aWB: '',
-                                      );
-                                    }),
-                                  );
-                                } else {
-                                  Fluttertoast.showToast(
-                                      msg: acted.headerInfo?.message
-                                              .toString() ??
-                                          'Error',
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      gravity: ToastGravity.CENTER,
-                                      timeInSecForIosWeb: 1,
-                                      backgroundColor: Colors.red,
-                                      textColor: Colors.white,
-                                      fontSize: 16.0);
-                                }
                               } else {
                                 Fluttertoast.showToast(
-                                    msg: "اختر سبب الرفض",
+                                    msg: acted.headerInfo?.message.toString() ??
+                                        'Error',
                                     toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.BOTTOM,
+                                    gravity: ToastGravity.CENTER,
                                     timeInSecForIosWeb: 1,
                                     backgroundColor: Colors.red,
                                     textColor: Colors.white,
                                     fontSize: 16.0);
                               }
-                            },
-                            child: const Text('تم')),
-                        ElevatedButton(
-                          onPressed: () async {
-                            pickFiles(fileType);
+                            } else {
+                              Fluttertoast.showToast(
+                                  msg: "اختر سبب الرفض",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: Colors.red,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0);
+                            }
                           },
-                          child: const Text('ارفع الصوره '),
-                        ),
-                      ]),
-                if (file != null)
-                  ElevatedButton(
-                    onPressed: () {
-                      viewFile(file!);
-                      if (kDebugMode) {
-                        print(file!.path!);
-                      }
-                    },
-                    child: const Text('اظهار الصورة المرفوعة'),
-                  ),
+                          child: const Text('تم')),
+                      ElevatedButton(
+                        onPressed: () async {
+                          pickFiles(fileType);
+                        },
+                        child: const Text('ارفع الصوره '),
+                      ),
+                    ]),
               ]),
         ));
   }
