@@ -4,6 +4,8 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:unique_identifier/unique_identifier.dart';
+
 
 class ServicesUtility {
   getId() async {
@@ -12,8 +14,10 @@ class ServicesUtility {
       var iosDeviceInfo = await deviceInfo.iosInfo;
       return iosDeviceInfo.identifierForVendor;
     } else {
-      var androidDeviceInfo = await deviceInfo.androidInfo;
-      return androidDeviceInfo.id;
+      // var androidDeviceInfo = await deviceInfo.androidInfo;
+      String?  identifier =await UniqueIdentifier.serial;
+
+      return identifier;
     }
   }
 
